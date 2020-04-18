@@ -10,6 +10,7 @@ import tellolib.command.TelloFlip;
 import tellolib.communication.TelloCommunication;
 import tellolib.communication.TelloConnection;
 import tellolib.drone.TelloDrone;
+import tellolib.drone.TelloModel;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -103,6 +104,14 @@ public class TelloControl implements TelloControlInterface
 	{
 		TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.COMMAND_MODE);
 		communication.executeCommand(command);
+		
+		// Determine drone model.
+		
+		try
+		{
+			getSN();
+		}
+		catch (Exception  e) { drone.setModel(TelloModel.Basic); }
 	}
 	
 	@Override
@@ -294,6 +303,12 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public String getSN()
 	{
+		if (drone.getModel() == TelloModel.Basic)
+		{
+			logger.warning("SN command requires Tello EDU");
+			return "";
+		}
+		
 		TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.SN);
 		String sn = communication.executeReadCommand(command);
 		drone.setSN(sn.trim());
@@ -504,68 +519,6 @@ public class TelloControl implements TelloControlInterface
 	    }
 	}
 
-//	@Override
-//	public TelloDrone getDrone()
-//	{
-//		return drone;
-//	}
-//
-//	@Override
-//	public void startVideoCapture(boolean liveWindow)
-//	{
-//		if (telloCamera != null) stopVideoCapture();
-//		
-//		telloCamera = TelloCamera.getInstance();
-//		
-//		telloCamera.startVideoCapture(liveWindow);
-//	}
-//
-//	@Override
-//	public void stopVideoCapture()
-//	{
-//		if (telloCamera != null) telloCamera.stopVideoCapture();
-//	}
-//
-//	@Override
-//	public boolean takePicture( String folder )
-//	{
-//		if (telloCamera != null) return telloCamera.takePicture(folder);
-//		
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean startRecording( String folder )
-//	{
-//		if (telloCamera != null)  return telloCamera.startRecording(folder);
-//		
-//		return false;
-//	}
-//
-//	@Override
-//	public void stopRecording()
-//	{
-//		if (telloCamera != null) telloCamera.stopRecording();
-//	}
-//
-//	@Override
-//	public boolean isRecording()
-//	{
-//		if (telloCamera != null) 
-//			return telloCamera.isRecording();
-//		else
-//			return false;
-//	}
-//
-//	@Override
-//	public Mat getImage()
-//	{
-//		if (telloCamera != null) 
-//			return telloCamera.getImage();
-//		else
-//			return null;
-//	}
-
 	@Override
 	public void setMissionMode( boolean enabled, MissionDetectionCamera camera )
 	{
@@ -588,119 +541,10 @@ public class TelloControl implements TelloControlInterface
 		}
 	}
 
-//	@Override
-//	public boolean isMissionModeEnabled()
-//	{
-//		return drone.isMissionModeEnabled();
-//	}
-//
-//	@Override
-//	public int getMissionPadId()
-//	{
-//		return drone.getMissionPadId();
-//	}
-//
-//	@Override
-//	public int[] getMissionPadxyz()
-//	{
-//		return drone.getMissionPadxyz();
-//	}
-//
-//	@Override
-//	public int[] getMissionPadpry()
-//	{
-//		return drone.getMissionPadpry();
-//	}
-
-//	@Override
-//	public int getRawYaw()
-//	{
-//		return drone.getRawYaw();
-//	}
-//
-//	@Override
-//	public int getHeading()
-//	{
-//		return drone.getHeading();
-//	}
-//
-//	@Override
-//	public void resetHeadingZero()
-//	{
-//		drone.resetHeadingZero();
-//	}
-//
-//	@Override
-//	public int getYaw()
-//	{
-//		return drone.getYaw();
-//	}
-//
-//	@Override
-//	public void resetYawZero()
-//	{
-//		drone.resetYawZero();
-//	}
-//
-//	@Override
-//	public boolean detectArucoMarkers()
-//	{
-//		ArucoMarkers at = ArucoMarkers.getInstance();
-//
-//		Mat image = telloCamera.getImage();
-//		
-//		return at.detectMarkers(image);
-//	}
-//
-//	@Override
-//	public int getArucoMarkerCount()
-//	{
-//		ArucoMarkers at = ArucoMarkers.getInstance();
-//
-//		return at.getMarkerCount();
-//	}
-//
-//	@Override
-//	public int getArucoMarkerId( int index )
-//	{
-//		ArucoMarkers at = ArucoMarkers.getInstance();
-//
-//		return at.getMarkerId(index);
-//	}
-//
-//	@Override
-//	public void addTarget( Rect target )
-//	{
-//		if (telloCamera != null) telloCamera.addTarget(target);
-//	}
-//
-//	@Override
-//	public void addTarget( Rect target, int width, Scalar color )
-//	{
-//		if  (telloCamera != null) telloCamera.addTarget(target, width, color);
-//	}
-//
-//	@Override
-//	public ArrayList<Rect> getArucoMarkerTargets()
-//	{
-//		return ArucoMarkers.getInstance().getMarkerTargets();
-//	}
-//	
-//	@Override
-//	public void setContours(ArrayList<MatOfPoint> contours)
-//	{
-//		telloCamera.setContours(contours);
-//	}
-//
-//	@Override
-//	public ArrayList<MatOfPoint> getArucoMarkerContours()
-//	{
-//		return ArucoMarkers.getInstance().getMarkerContours();
-//	}
-//
-//	@Override
-//	public void setContours( ArrayList<MatOfPoint> contours, int width, Scalar color )
-//	{
-//		telloCamera.setContours(contours, width, color);
-//	}
+	@Override
+	public void setStationMode( String ssid, String password )
+	{
+		TelloCommandInterface command = new ComplexTelloCommand(TelloCommandValues.STATION_MODE, ssid + " " + password);
+		communication.executeCommand(command);
+	}
 }

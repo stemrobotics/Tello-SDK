@@ -275,4 +275,16 @@ public interface TelloDroneInterface
 	 * Only valid when status monitoring enabled.
   	 */
   	public void resetYawZero();
+  	
+  	/**
+  	 * Set the drone model.
+  	 * @param model Drone model (basic/EDU).
+  	 */
+  	public void setModel(TelloModel model);
+  	
+  	/**
+  	 * Get the drone model setting.
+  	 * @return The drone model value.
+  	 */
+  	public TelloModel getModel();
 }

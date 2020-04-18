@@ -28,6 +28,7 @@ public class TelloDrone implements TelloDroneInterface
   private TelloConnection 	telloConnection;
   private TelloMode 		telloMode;
   private boolean			missionModeEnabled;
+  private TelloModel		telloModel = TelloModel.EDU;
 
   // Private constructor, holder class and getInstance() implement this
   // class as a singleton.
@@ -318,5 +319,17 @@ public class TelloDrone implements TelloDroneInterface
   public void resetYawZero()
   {
 	  yawZeroOffset = getRawYaw();
+  }
+
+  @Override
+  public void setModel( TelloModel model )
+  {
+	  telloModel = model;
+  }
+
+  @Override
+  public TelloModel getModel()
+  {
+	  return telloModel;
   }
 }

@@ -205,4 +205,10 @@ public class TelloCommandValues
    * Select mission mode camera(s).
    */
   public static final String MDIRECTION = "mdirection";
+  
+  /**
+   * Put drone in station mode. In this mode the drone is not a WIFI access point.
+   * Instead it will connect to the named network using the provided password.
+   */
+  public static final String STATION_MODE = "ap";
 }
