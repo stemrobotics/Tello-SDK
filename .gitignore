@@ -1,0 +1,24 @@
+
+# Distribution / packaging
+build/
+dist/
+downloads/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Eclipse items
+.settings/
+
+# Project specific
+Photos/*.avi
+Photos/*.jpg
+#Tello Manuals/
+#doc/
+/target/
