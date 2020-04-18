@@ -1,8 +1,8 @@
-# Tello-SDK
+## Tello-SDK
 
 Java programming support for the Tello Drone. 
 
-## Project Description
+### Project Description
 
 This Eclipse project is a complete example of how to program the Tello & Tello EDU drones
 from DJI. The user can add classes to fly the drone or create missions without having
@@ -16,7 +16,7 @@ from the drone and using OpenCV for visual recognition and tracking.
 
 This project is the companion to the STEM Robotics [Java for Robots course](https://stemrobotics.cs.pdx.edu/node/4196), Tello off-ramp.
 
-## How to Download
+### How to Download
 
 On the github repo, click the **green Clone or Download** button. Then click **download zip**.
 Once the zip file (approx 35mb) is on your PC, copy the **Tello-SDK-master** directory in the zip 

@@ -146,12 +146,12 @@ public class TelloCommandValues
   public static final String CURRENT_FLY_TIME = "time?";
 
   /**
-   * Obtain the Tello SDK version.
+   * Obtain the Tello SDK version. Requires EDU with SDK 1.3 or later.
    */
   public static final String SDK = "sdk?";
 
   /**
-   * Obtain the Tello serial number.
+   * Obtain the Tello serial number. Requires EDU with SDK 1.3 or later.
    */
   public static final String SN = "sn?";
 

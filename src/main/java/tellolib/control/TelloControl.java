@@ -334,6 +334,12 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public String getSDK()
 	{
+		if (drone.getModel() == TelloModel.Basic)
+		{
+			logger.warning("SDK command requires Tello EDU");
+			return "";
+		}
+		
 		TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.SDK);
 		String sdk = communication.executeReadCommand(command);
 		drone.setSDK(sdk.trim());

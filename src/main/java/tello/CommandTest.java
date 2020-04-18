@@ -22,7 +22,7 @@ public class CommandTest
 	    
 	    TelloDrone drone = TelloDrone.getInstance();
 	    
-	    telloControl.setLogLevel(Level.FINER);
+	    telloControl.setLogLevel(Level.FINE);
 
 	    try 
 	    {
