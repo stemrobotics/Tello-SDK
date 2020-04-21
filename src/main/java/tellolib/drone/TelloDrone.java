@@ -27,7 +27,7 @@ public class TelloDrone implements TelloDroneInterface
   private String			sn, sdk;
   private TelloConnection 	telloConnection;
   private TelloMode 		telloMode;
-  private boolean			missionModeEnabled;
+  private boolean			missionModeEnabled, flying;
   private TelloModel		telloModel = TelloModel.EDU;
 
   // Private constructor, holder class and getInstance() implement this
@@ -331,5 +331,17 @@ public class TelloDrone implements TelloDroneInterface
   public TelloModel getModel()
   {
 	  return telloModel;
+  }
+
+  @Override
+  public void setFlying( boolean flying )
+  {
+	  this.flying = flying;
+  }
+
+  @Override
+  public boolean isFlying()
+  {
+	  return flying;
   }
 }

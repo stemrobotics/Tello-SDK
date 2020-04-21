@@ -105,7 +105,7 @@ public class TelloControl implements TelloControlInterface
 		TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.COMMAND_MODE);
 		communication.executeCommand(command);
 		
-		// Determine drone model.
+		// Determine drone model. This method call will fail if not a Tello EDU and SDk 1.3.
 		
 		try
 		{
@@ -117,8 +117,13 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public void takeOff() 
 	{
-		TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.TAKE_OFF);
-		communication.executeCommand(command);
+		try
+		{
+			TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.TAKE_OFF);
+			communication.executeCommand(command);
+			drone.setFlying(true);
+		}
+		catch (Exception e) { throw e; }
 	}
 	
 	@Override
@@ -126,6 +131,7 @@ public class TelloControl implements TelloControlInterface
 	{
 		TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.LAND);
 	  	communication.executeCommand(command);
+	  	drone.setFlying(false);
 	}
 	
 	@Override
@@ -414,7 +420,7 @@ public class TelloControl implements TelloControlInterface
 	    		{
 	    			String logData = communication.receiveStatusData();
 	    			
-	    			logger.finer(logData);
+	    			logger.finest(logData);
 	    			
 	    			String[] keyValuePairs = logData.split(";"); 
 
@@ -513,7 +519,7 @@ public class TelloControl implements TelloControlInterface
 	    	{
 	    		while (!isInterrupted())
 	    		{
-	    			sleep(10000);	// 10 seconds.
+	    			sleep(5000);	// 5 seconds.
 	    			
 	    			getBattery();
 	    		}

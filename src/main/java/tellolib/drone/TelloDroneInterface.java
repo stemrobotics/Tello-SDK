@@ -287,4 +287,17 @@ public interface TelloDroneInterface
   	 * @return The drone model value.
   	 */
   	public TelloModel getModel();
+  	
+  	/**
+  	 * Set the flying status of the drone. Set true after successful
+  	 * take off and false after landing.
+  	 * @param flying True if drone is flying, false if not.
+  	 */
+  	public void setFlying(boolean flying);
+  	
+  	/**
+  	 * Return flying status.
+  	 * @return True if flying, false if not.
+  	 */
+  	public boolean isFlying();
 }

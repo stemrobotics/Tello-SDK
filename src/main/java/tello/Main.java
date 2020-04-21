@@ -3,23 +3,47 @@ package tello;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Main {
-  private static final Logger logger = Logger.getGlobal();
+// Main class contains the method main(), which is what Java JRE 
+// calls to begin execution when a Java program is run.
+public class Main 
+{
+	// Get reference to Java's built-in logging class.
+	private static final Logger logger = Logger.getGlobal();
 
-  public static void main(String[] args) 
-  {
-	  	logger.setLevel(Level.FINE);
+	// Main always called to start a Java program.
+	public static void main(String[] args) 
+	{
+		// Set default logging level to a bit more detailed than INFO. Logging
+		// statements of INFO or above (WARNING,SEVERE) will be output to
+		// the console window. INFO level is typically used to show high
+		// level informational messages.
+	  	logger.setLevel(Level.INFO);
 	  	
 	    logger.info("start");
 	    
-	    CommandTest commandTest = new CommandTest();
+	    // Create an instance of the drone program (class) we want to run.
+//	    Demo1 demo = new Demo1();
+
+//		Demo2 demo = new Demo2();
+
+//	    Demo3 demo = new Demo3();
+
+//	    Demo4 demo = new Demo4();
+
+	    Demo5 demo = new Demo5();
 	    
-	    commandTest.executeCommandTest();
+	    // Run that program.
+	    demo.execute();
+
+	    //CommandTest commandTest = new CommandTest();
+	    
+	    // Run that program.
+	    //commandTest.executeCommandTest();
 	    
 	    //ControllerTest controllerTest = new ControllerTest();
 	    
 	    //controllerTest.executeControllerTest();
 	    
 	    logger.info("end");
-  }
+	}
 }
