@@ -30,7 +30,13 @@ public class Main
 
 //	    Demo4 demo = new Demo4();
 
-	    Demo5 demo = new Demo5();
+//	    Demo5 demo = new Demo5();
+
+//	    FlySquare demo = new FlySquare();
+
+//	    FlyGrid demo = new FlyGrid();
+
+	    FindMissionPad demo = new FindMissionPad();
 	    
 	    // Run that program.
 	    demo.execute();

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -49,6 +50,7 @@ public class TelloCamera implements TelloCameraInterface
 	private JFrame				jFrame;
 	private JLabel				jLabel;
 	private String				statusBar = null;
+	private Supplier			<String>statusBarMethod = null;
 	
 	private ArrayList<Rect>			targetRectangles;
 	private ArrayList<MatOfPoint>	contours = null;
@@ -192,9 +194,15 @@ public class TelloCamera implements TelloCameraInterface
 	    				Imgproc.drawContours(image, contours, -1, contourColor, contourWidth);
 	    			}
 
-	    			if (statusBar != null)
+	    			if (statusBar != null && statusBarMethod == null)
 	    			{
 	    				Imgproc.putText(image, statusBar, new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
+	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
+	    			}
+
+	    			if (statusBarMethod != null)
+	    			{
+	    				Imgproc.putText(image, statusBarMethod.get(), new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
 	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
 	    			}
 
@@ -366,5 +374,11 @@ public class TelloCamera implements TelloCameraInterface
 	public void setStatusBar( String message )
 	{
 		statusBar = message;
+	}
+
+	@Override
+	public void setStatusBar( Supplier<String> method )
+	{
+		statusBarMethod = method;
 	}
 }

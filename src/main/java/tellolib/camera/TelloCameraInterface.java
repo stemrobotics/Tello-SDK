@@ -1,6 +1,7 @@
 package tellolib.camera;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -97,4 +98,11 @@ public interface TelloCameraInterface
    * @param message The data to be displayed or null to clear.
    */
   public void setStatusBar(String message);
+  
+  /**
+   * Sets a method that will be called in the video stream processing loop to
+   * automatically set status area at the bottom of the video feed.
+   * @param method A method that returns the string to be displayed.
+   */
+  public void setStatusBar(Supplier<String> method);
 }
