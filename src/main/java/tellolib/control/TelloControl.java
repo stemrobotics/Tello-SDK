@@ -449,6 +449,7 @@ public class TelloControl implements TelloControlInterface
 	    			    	case "vgy": veloxyz[1] = Double.parseDouble(entry[1].trim()); break;
 	    			    	case "vgz": veloxyz[2] = Double.parseDouble(entry[1].trim()); break;
 
+	    			    	// Record mission pad id number and x,y,z values read from the pad.
 	    			    	case "mid": drone.setMissionPadId(Integer.parseInt(entry[1].trim())); break;
 	    			    	case "x": mpxyz[0] = Integer.parseInt(entry[1].trim()); break;
 	    			    	case "y": mpxyz[1] = Integer.parseInt(entry[1].trim()); break;

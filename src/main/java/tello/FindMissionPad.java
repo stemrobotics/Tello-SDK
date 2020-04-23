@@ -46,14 +46,16 @@ public class FindMissionPad
 		    
 		    camera.startVideoCapture(true);
 		    
+		    // Turn on Mission Pad detection and select camera to monitor.
+		    
 		    telloControl.setMissionMode(true, MissionDetectionCamera.downward);
 		    
 		    // Create background thread to watch for mission pad under drone. It 
-		    // will signal to stop the search.
+		    // will signal to stop the search. WatchForPad is defined below.
 		    
 		    WatchForPad padWatcher = new WatchForPad();
 		    
-		    // Start the thread.
+		    // Start the thread. start() calls Thread run method.
 		    
 		    padWatcher.start();
 		    
@@ -119,7 +121,7 @@ public class FindMissionPad
 	}
 	
 	// Thread class that runs in background and watches for the status feed from drone
-	// to indicate a mission pad is recognized by the bottom camera.
+	// to indicate a mission pad is recognized by the selected camera.
 	
 	private class WatchForPad extends Thread
 	{
@@ -131,15 +133,20 @@ public class FindMissionPad
 			
 	    	try
 	    	{
+	    		// Loop until we are done.
+	    		
     	    	while (!isInterrupted() && drone.isFlying())
     	    	{
     	    		padId = drone.getMissionPadId();
     	    		
+    	    		// Pad id greater than zero means a pad is detected.
+    	    		
     	    		if (padId > 0) 
     	    		{
+    	    			telloControl.stop();	// Abort current movement.
     	    			padFound = true;
     	    			logger.info(String.format("mission pad %d detected", padId));
-    	    			break;
+    	    			break;	// Kicks us out of the while loop.
     	    		}
     	    		
     	    		sleep(10);	// Wait 10 ms.
