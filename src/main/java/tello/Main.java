@@ -11,7 +11,7 @@ public class Main
 	private static final Logger logger = Logger.getGlobal();
 
 	// Main always called to start a Java program.
-	public static void main(String[] args) 
+	public static void main(String[] args) throws Exception 
 	{
 		// Set default logging level to a bit more detailed than INFO. Logging
 		// statements of INFO or above (WARNING,SEVERE) will be output to
@@ -36,7 +36,11 @@ public class Main
 
 //	    FlyGrid demo = new FlyGrid();
 
-	    FindMissionPad demo = new FindMissionPad();
+//	    FindMissionPad demo = new FindMissionPad();
+
+//	    FlyController demo = new FlyController();
+
+	    FindMissionPad2 demo = new FindMissionPad2();
 	    
 	    // Run that program.
 	    demo.execute();

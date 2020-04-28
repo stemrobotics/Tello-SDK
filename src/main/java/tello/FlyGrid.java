@@ -42,7 +42,7 @@ public class FlyGrid
 		    
 		    camera.setStatusBar(this::updateWindow);
 		    
-		    camera.startVideoCapture(true);
+		    camera.startVideoCapture(false);
 		    
 		    // Now we will execute a series of movement commands to fly in a grid
 		    // pattern. Distances in centimeters.

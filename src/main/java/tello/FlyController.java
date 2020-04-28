@@ -21,12 +21,24 @@ public class FlyController
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
 
-	public void execute()
+	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
 
 		logger.info("start");
-		
+
+	    // Create game pad class from the Jamepad library included in this project.
+	    // The class supports multiple controllers.
+	    
+	    controllers = new ControllerManager();
+		controllers.initSDLGamepad();
+    	
+    	ControllerState currState = controllers.getState(0);
+    	  
+    	// No controller, no fly!
+    	
+    	if (!currState.isConnected) throw new Exception("controller not connected");
+
 	    telloControl = TelloControl.getInstance();
 	    
 	    drone = TelloDrone.getInstance();
@@ -34,12 +46,6 @@ public class FlyController
 	    camera = TelloCamera.getInstance();
 
 	    telloControl.setLogLevel(Level.FINE);
-
-	    // Create game pad class from the Jamepad library included in this project.
-	    // The class supports multiple controllers.
-	    
-	    controllers = new ControllerManager();
-		controllers.initSDLGamepad();
 		
 		// Controller mapping:
 		// Start button = take off
@@ -61,8 +67,6 @@ public class FlyController
 		    
 		    telloControl.startStatusMonitor();
 		    
-		    telloControl.takeOff();
-		    
 		    telloControl.streamOn();
 		    
 		    camera.setStatusBar(this::updateWindow);
@@ -76,15 +80,7 @@ public class FlyController
 		    	// Read the current state of the first (and in our case only)
 		    	// game pad.
 		    	
-		    	ControllerState currState = controllers.getState(0);
-		    	  
-		    	// No controller, no fly!
-		    	
-		    	if (!currState.isConnected) 
-		    	{
-		    		logger.severe("controller not connected");
-		    		break;
-		    	}
+		    	currState = controllers.getState(0);
 		    	  
 		    	// Back button lands drone and exits while loop.
 		    	

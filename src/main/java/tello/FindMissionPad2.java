@@ -9,7 +9,7 @@ import tellolib.communication.TelloConnection;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
-public class FindMissionPad
+public class FindMissionPad2
 {
 	private final Logger logger = Logger.getGlobal(); 
 
@@ -40,11 +40,11 @@ public class FindMissionPad
 		    
 		    telloControl.takeOff();
 		    
-		    telloControl.streamOn();
+		    //telloControl.streamOn();
 		    
 		    camera.setStatusBar(this::updateWindow);
 		    
-		    camera.startVideoCapture(false);
+		    //camera.startVideoCapture(false);
 		    
 		    // Turn on Mission Pad detection and select camera to monitor.
 		    
@@ -64,33 +64,19 @@ public class FindMissionPad
 		    
 		    for (int i = 0; i < 2; i++)
 		    {
-		    	telloControl.forward(100);
-		    	
-		    	if (padFound) break;
+		    	if (flyForward(100, 20)) break;
 		    	
 		    	telloControl.rotateRight(90);
-		    	
-		    	if (padFound) break;
 
-		    	telloControl.forward(20);
-		    	
-		    	if (padFound) break;
+		    	if (flyForward(20, 10)) break;
 		    	
 		    	telloControl.rotateRight(90);
 		    	
-		    	if (padFound) break;
-		    	
-		    	telloControl.forward(100);
-		    	
-		    	if (padFound) break;
+		    	if (flyForward(100, 10)) break;
 		    	
 		    	telloControl.rotateLeft(90);
-		    	
-		    	if (padFound) break;
 
-		    	telloControl.forward(20);
-		    	
-		    	if (padFound) break;
+		    	if (flyForward(20, 10)) break;
 		    	
 		    	telloControl.rotateLeft(90);
 		    }
@@ -110,6 +96,25 @@ public class FindMissionPad
     	telloControl.disconnect();
 	    
 	    logger.info("end");
+	}
+	
+	private boolean flyForward(int distance, int speed) throws InterruptedException
+	{
+		int startTime = drone.getTime();
+		int endTime = distance / speed + startTime;
+		
+		logger.info(String.format("st=%d  et=%d", startTime, endTime));
+
+		while (drone.getTime() < endTime && !padFound)
+		{
+			telloControl.flyRC(0, speed, 0, 0);
+			
+    		Thread.sleep(10);	// Wait 10 ms.
+		}
+		
+		telloControl.flyRC(0, 0, 0, 0);
+		
+		return padFound;
 	}
 	
 	// Return a string of info for the status area on video feed.
@@ -138,21 +143,22 @@ public class FindMissionPad
     	    	while (!isInterrupted() && drone.isFlying())
     	    	{
     	    		padId = drone.getMissionPadId();
+
     	    		
     	    		// Pad id greater than zero means a pad is detected.
     	    		
     	    		if (padId > 0) 
     	    		{
     	    			padFound = true;
-    	    			telloControl.stop();	// Put drone into hover.
     	    			logger.info(String.format("mission pad %d detected", padId));
     	    			break;	// Kicks us out of the while loop.
     	    		}
     	    		
-    	    		sleep(10);	// Wait 10 ms.
+    	    		sleep(1000);	// Wait 100 ms or .1 second.
     	    	}
 	    	}
 	    	catch (InterruptedException e) { }
 	    }
 	}
 }
+
