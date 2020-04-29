@@ -107,7 +107,17 @@ public class FlyController
 
 		    	// A button takes a picture.
 		    	
-		    	if  (currState.aJustPressed) camera.takePicture(System.getProperty("user.dir") + "\\Photos");
+		    	if  (currState.aJustPressed) {camera.takePicture(System.getProperty("user.dir") + "\\Photos");}
+		    	
+		    	// B button toggles video recording.
+		    	
+		    	if (currState.bJustPressed)
+		    	{
+		    		if (camera.isRecording())
+		    			camera.stopRecording();
+		    		else
+		    			camera.startRecording(System.getProperty("user.dir") + "\\Photos");
+		    	}
 
 		    	// If flying, pass the controller joystick deflection to the drone via
 		    	// the flyRC command.
@@ -165,11 +175,13 @@ public class FlyController
 	}	
 	
 	// Return a string of info for the status area on video feed.
+	// Drone won't respond to controller until Rdy = True, meaning
+	// that takeoff is complete.
 	
 	private String updateWindow()
 	{
-    	 return String.format("Batt: %d  Alt: %d  Hdg: %d", drone.getBattery(), drone.getHeight(), 
-    			drone.getHeading());
+    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b", drone.getBattery(), drone.getHeight(), 
+    			drone.getHeading(), drone.isFlying());
 	}
 }
 

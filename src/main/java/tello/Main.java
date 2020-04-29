@@ -38,9 +38,9 @@ public class Main
 
 //	    FindMissionPad demo = new FindMissionPad();
 
-//	    FlyController demo = new FlyController();
+	    FlyController demo = new FlyController();
 
-	    FindMissionPad2 demo = new FindMissionPad2();
+//	    FindMissionPad2 demo = new FindMissionPad2();
 	    
 	    // Run that program.
 	    demo.execute();

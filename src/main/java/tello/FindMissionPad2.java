@@ -28,7 +28,7 @@ public class FindMissionPad2
 	    
 	    camera = TelloCamera.getInstance();
 
-	    telloControl.setLogLevel(Level.FINE);
+	    telloControl.setLogLevel(Level.FINEST);
 
 	    try 
 	    {
@@ -64,7 +64,7 @@ public class FindMissionPad2
 		    
 		    for (int i = 0; i < 2; i++)
 		    {
-		    	if (flyForward(100, 20)) break;
+		    	if (flyForward(100, 30)) break;
 		    	
 		    	telloControl.rotateRight(90);
 
@@ -72,7 +72,7 @@ public class FindMissionPad2
 		    	
 		    	telloControl.rotateRight(90);
 		    	
-		    	if (flyForward(100, 10)) break;
+		    	if (flyForward(100, 30)) break;
 		    	
 		    	telloControl.rotateLeft(90);
 
@@ -106,6 +106,25 @@ public class FindMissionPad2
 		logger.info(String.format("st=%d  et=%d", startTime, endTime));
 
 		while (drone.getTime() < endTime && !padFound)
+		{
+			telloControl.flyRC(0, speed, 0, 0);
+			
+    		Thread.sleep(100);	// Wait 10 ms.
+		}
+		
+		telloControl.flyRC(0, 0, 0, 0);
+		
+		return padFound;
+	}
+	
+	private boolean flyForward2(int distance, int speed) throws InterruptedException
+	{
+		long startTimeMS = System.currentTimeMillis();
+		long endTimeMS = (long) ((double) distance / (double) speed * 1000.0 + startTimeMS);
+		
+		logger.info(String.format("st=%d  et=%d  flt=%d", startTimeMS, endTimeMS, endTimeMS - startTimeMS));
+
+		while (System.currentTimeMillis() < endTimeMS && !padFound)
 		{
 			telloControl.flyRC(0, speed, 0, 0);
 			
@@ -154,7 +173,7 @@ public class FindMissionPad2
     	    			break;	// Kicks us out of the while loop.
     	    		}
     	    		
-    	    		sleep(1000);	// Wait 100 ms or .1 second.
+    	    		sleep(1000);	// Wait 1000 ms or 1 second.
     	    	}
 	    	}
 	    	catch (InterruptedException e) { }

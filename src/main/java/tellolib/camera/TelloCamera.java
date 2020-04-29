@@ -2,22 +2,17 @@ package tellolib.camera;
 
 import java.awt.Dimension;
 import java.awt.Image;
-import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -41,10 +36,10 @@ public class TelloCamera implements TelloCameraInterface
 	private boolean				recording;
 	private Thread				videoCaptureThread;
 	private VideoCapture		camera;
-	private Mat					image;
+	private Mat					image = new Mat();
 	private VideoWriter			videoWriter;
 	private ImageWindow			imageWindow;
-	private Size				videoFrameSize = new Size(960, 720);
+	private Size				videoFrameSize = new Size(960, 670);
 	private double				videoFrameRate = 30;
 	private SimpleDateFormat	df = new SimpleDateFormat("yyyy-MM-dd.HHmmss");
 	private JFrame				jFrame;
@@ -85,7 +80,7 @@ public class TelloCamera implements TelloCameraInterface
 		logger.fine("starting video capture");
 		
 		if (camera != null) return;
-
+		
 		// Create VideoCapture object to accept video feed from drone.
 		
 		camera = new VideoCapture();
@@ -95,9 +90,7 @@ public class TelloCamera implements TelloCameraInterface
 		camera.open("udp://0.0.0.0:" + Integer.toString(TelloDrone.UDP_VIDEO_PORT), Videoio.CAP_FFMPEG);
 		
 		logger.fine("video camera open:" + camera.isOpened());
-		
-		image = new Mat();
-		
+
 		// Create window to display live video feed.
 
 		if (liveWindow)
@@ -165,7 +158,7 @@ public class TelloCamera implements TelloCameraInterface
 		
 	    public void run()
 	    {
-	    	Mat	image2 = new Mat();
+	    	Mat	imageRaw = new Mat();
 	    	
 			logger.fine("video capture thread started");
 			
@@ -176,8 +169,10 @@ public class TelloCamera implements TelloCameraInterface
 	    		
 	    		while (!isInterrupted())
 	    		{
-	    		    synchronized (this) { camera.read(image); }
+	    		    synchronized (this) { camera.read(imageRaw); }
 	    			
+	    			Imgproc.resize(imageRaw, image, videoFrameSize);
+
 	    		    // Draw target rectangles on image.
 	    		    
 	    			if (targetRectangles != null)
@@ -214,8 +209,8 @@ public class TelloCamera implements TelloCameraInterface
 	    			
 	    			if (recording) 
 	    			{
-	    				Imgproc.resize(image, image2, videoFrameSize);
-	    				videoWriter.write(image2);
+	    				//Imgproc.resize(image, image2, videoFrameSize);
+	    				videoWriter.write(image);
 	    			}
 	    		}
 	    		
@@ -249,6 +244,7 @@ public class TelloCamera implements TelloCameraInterface
 			fileName = folder + "\\" + df.format(new Date()) + ".jpg";
 			
 			logger.info("h=" + image.height() + ";w=" + image.width());
+			
 			if (Imgcodecs.imwrite(fileName, image))
 			{
 				logger.fine("Picture saved to " + fileName);
