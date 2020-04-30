@@ -20,7 +20,6 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.videoio.*;
 import org.opencv.highgui.HighGui;
-import org.opencv.highgui.ImageWindow;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -38,7 +37,6 @@ public class TelloCamera implements TelloCameraInterface
 	private VideoCapture		camera;
 	private Mat					image = new Mat();
 	private VideoWriter			videoWriter;
-	private ImageWindow			imageWindow;
 	private Size				videoFrameSize = new Size(960, 670);
 	private double				videoFrameRate = 30;
 	private SimpleDateFormat	df = new SimpleDateFormat("yyyy-MM-dd.HHmmss");
