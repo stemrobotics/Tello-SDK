@@ -375,4 +375,10 @@ public class TelloCamera implements TelloCameraInterface
 	{
 		statusBarMethod = method;
 	}
+
+	@Override
+	public void setVideoFrameSize( int width, int height )
+	{
+		videoFrameSize = new Size(width, height);		
+	}
 }
