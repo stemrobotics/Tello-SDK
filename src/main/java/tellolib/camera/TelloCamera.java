@@ -2,11 +2,13 @@ package tellolib.camera;
 
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.awt.Toolkit.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -37,7 +39,9 @@ public class TelloCamera implements TelloCameraInterface
 	private VideoCapture		camera;
 	private Mat					image = new Mat();
 	private VideoWriter			videoWriter;
-	private Size				videoFrameSize = new Size(960, 670);
+	private Dimension 			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//	private Size				videoFrameSize = new Size(960, 670);
+	private Size				videoFrameSize = new Size(screenSize.width - 400, screenSize.height - 100);
 	private double				videoFrameRate = 30;
 	private SimpleDateFormat	df = new SimpleDateFormat("yyyy-MM-dd.HHmmss");
 	private JFrame				jFrame;
@@ -94,7 +98,7 @@ public class TelloCamera implements TelloCameraInterface
 		if (liveWindow)
 		{
 	        jFrame = new JFrame("Tello Controller Test");
-	        jFrame.setMinimumSize(new Dimension((int) videoFrameSize.width, (int) videoFrameSize.height));
+	        jFrame.setPreferredSize(new Dimension((int) videoFrameSize.width, (int) videoFrameSize.height));
 	        jLabel = new JLabel();
 	        jFrame.getContentPane().add(jLabel);
 	        jFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -170,34 +174,25 @@ public class TelloCamera implements TelloCameraInterface
 	    		    synchronized (this) { camera.read(imageRaw); }
 	    			
 	    			Imgproc.resize(imageRaw, image, videoFrameSize);
-
+	
 	    		    // Draw target rectangles on image.
 	    		    
 	    			if (targetRectangles != null)
-	    			{
 	    				for (Rect rect: targetRectangles) 
 	    					Imgproc.rectangle(image, 
 	    							new Point(rect.x, rect.y), 
 	    							new Point(rect.x + rect.width, rect.y +  rect.height), 
 	    							targetColor, targetWidth);
-	    			}
 	    			
-	    			if (contours != null)
-	    			{
-	    				Imgproc.drawContours(image, contours, -1, contourColor, contourWidth);
-	    			}
+	    			if (contours != null) Imgproc.drawContours(image, contours, -1, contourColor, contourWidth);
 
 	    			if (statusBar != null && statusBarMethod == null)
-	    			{
 	    				Imgproc.putText(image, statusBar, new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
 	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
-	    			}
 
 	    			if (statusBarMethod != null)
-	    			{
 	    				Imgproc.putText(image, statusBarMethod.get(), new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
 	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
-	    			}
 
 	    			// write image to live window if open.
 	    		    
@@ -205,11 +200,7 @@ public class TelloCamera implements TelloCameraInterface
 	    			
 	    			// Write image to recording file if recording.
 	    			
-	    			if (recording) 
-	    			{
-	    				//Imgproc.resize(image, image2, videoFrameSize);
-	    				videoWriter.write(image);
-	    			}
+	    			if (recording) videoWriter.write(image);
 	    		}
 	    		
 	    		logger.fine("Video capture thread ended");
@@ -258,13 +249,18 @@ public class TelloCamera implements TelloCameraInterface
 	// Update the live window with the supplied image.
 	private void updateLiveWindow(Mat image)
 	{
-		//logger.info("updateLiveWindow");
+		Mat	imageSized = new Mat();
+		
 		try
 		{
-	        // Convert image Mat to a jpeg.
+			// Resize image to fit current window size.
+			//Imgproc.resize(image, imageSized, new Size(jFrame.getWidth(), jFrame.getHeight()));
+			videoFrameSize = new Size(jFrame.getWidth(), jFrame.getHeight());
+			
+	        // Convert image Mat to a jpeg image.
 	        Image img = HighGui.toBufferedImage(image);
 	        
-	        // Set label component of the live window to new jpeg.
+	        // Set label component of the live window to new image.
 	        jLabel.setIcon(new ImageIcon(img));
 		}
 		catch (Exception e) {logger.warning("live window update failed: " + e.toString());}

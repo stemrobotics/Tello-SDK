@@ -107,8 +107,9 @@ public interface TelloCameraInterface
   public void setStatusBar(Supplier<String> method);
   
   /**
-   * Sets the video frame size for live window, pictures and recorded video.
-   * Defaults to 960x670. Must be called before startVideoCapture().
+   * Sets the starting video frame size for live window, pictures and recorded video.
+   * Must be called before startVideoCapture(). Resizing live window will change the
+   * video frame size.
    * @param width Width of frame in pixels.
    * @param height Height of frame in pixels.
    */
