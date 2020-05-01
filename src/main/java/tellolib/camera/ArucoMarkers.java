@@ -95,7 +95,6 @@ public class ArucoMarkers implements ArucoMarkersInterface
 		if  (ids == null) return null;
 		
 		ArrayList<MatOfPoint> 	contours = new ArrayList<MatOfPoint>();
-		ArrayList<Rect>			markers = getMarkerTargets();
 		ArrayList<Point>		points;
 		
 		for (int i = 0; i < getMarkerCount(); i++)

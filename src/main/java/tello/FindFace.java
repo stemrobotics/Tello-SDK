@@ -3,16 +3,19 @@ package tello;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.opencv.core.Rect;
+
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
+import tellolib.camera.FaceDetection;
 import tellolib.camera.TelloCamera;
 import tellolib.command.TelloFlip;
 import tellolib.communication.TelloConnection;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
-public class FlyController
+public class FindFace
 {
 	private final Logger logger = Logger.getGlobal(); 
 
@@ -20,10 +23,13 @@ public class FlyController
 	private TelloDrone			drone;
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
+	private FaceDetection		faceDetector;
+	private boolean				found;
 
 	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
+		boolean	detectFaces = false;
 
 		logger.info("start");
 
@@ -44,7 +50,9 @@ public class FlyController
 	    drone = TelloDrone.getInstance();
 	    
 	    camera = TelloCamera.getInstance();
-
+	    
+	    faceDetector = FaceDetection.getInstance();
+	    		
 	    telloControl.setLogLevel(Level.FINE);
 		
 		// Controller mapping:
@@ -75,7 +83,7 @@ public class FlyController
 		   
 		    // Now we loop until land button is pressed or we lose connection.
 		    
-		    while(telloControl.getConnection() == TelloConnection.CONNECTED) 
+		    while(drone.isConnected()) 
 		    {
 		    	// Read the current state of the first (and in our case only)
 		    	// game pad.
@@ -119,7 +127,28 @@ public class FlyController
 		    			camera.startRecording(System.getProperty("user.dir") + "\\Photos");
 		    	}
 
-		    	// If flying, pass the controller joystick deflection to the drone via
+		    	if (currState.xJustPressed || detectFaces)
+		    	{
+		    		//logger.info("X pressed");
+		    		detectFaces = true;
+		    		
+	    			camera.addTarget(null);
+	
+	    			found = faceDetector.detectFaces();
+	    			
+	    			if (found)
+	    			{
+	    				int faceCount = faceDetector.getFaceCount();
+	
+	    				logger.info("face count=" + faceCount);
+	    				
+	    				Rect[] faces = faceDetector.getFaces();
+	    				
+	    				camera.addTarget(faces[0]);
+	    			}
+		    	}
+		    	
+    			// If flying, pass the controller joystick deflection to the drone via
 		    	// the flyRC command.
 		    	
 		    	if (drone.isFlying())
@@ -152,7 +181,7 @@ public class FlyController
 	    	e.printStackTrace();
 	    } finally 
 	    {
-	    	if (telloControl.getConnection() == TelloConnection.CONNECTED && drone.isFlying())
+	    	if (drone.isConnected() && drone.isFlying())
 	    	{
 	    		try
 	    		{telloControl.land();}
@@ -184,4 +213,3 @@ public class FlyController
     			drone.getHeading(), drone.isFlying());
 	}
 }
-

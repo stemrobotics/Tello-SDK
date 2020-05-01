@@ -300,4 +300,10 @@ public interface TelloDroneInterface
   	 * @return True if flying, false if not.
   	 */
   	public boolean isFlying();
+  	
+  	/**
+  	 * Return drone connection status.
+  	 * @return True if connected, false if not.
+  	 */
+  	public boolean isConnected();
 }

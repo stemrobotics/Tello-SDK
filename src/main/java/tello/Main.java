@@ -31,16 +31,18 @@ public class Main
 //	    Demo4 demo = new Demo4();
 
 //	    Demo5 demo = new Demo5();
-
+	    
 //	    FlySquare demo = new FlySquare();
 
 //	    FlyGrid demo = new FlyGrid();
 
 //	    FindMissionPad demo = new FindMissionPad();
 
-	    FlyController demo = new FlyController();
+//	    FlyController demo = new FlyController();
 
 //	    FindMissionPad2 demo = new FindMissionPad2();
+	
+	    FindFace demo = new FindFace();
 	    
 	    // Run that program.
 	    demo.execute();

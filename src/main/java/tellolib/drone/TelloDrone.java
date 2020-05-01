@@ -344,4 +344,13 @@ public class TelloDrone implements TelloDroneInterface
   {
 	  return flying;
   }
+
+@Override
+public boolean isConnected()
+{
+	if (telloConnection == TelloConnection.CONNECTED)
+		return true;
+	else
+		return false;
+}
 }

@@ -84,11 +84,11 @@ public class TelloCamera implements TelloCameraInterface
 		if (camera != null) return;
 		
 		// Create VideoCapture object to accept video feed from drone.
-		
 		camera = new VideoCapture();
 		
 	 	camera.setExceptionMode(true);
-		
+
+	 	// Start capture object listening for video packets.
 		camera.open("udp://0.0.0.0:" + Integer.toString(TelloDrone.UDP_VIDEO_PORT), Videoio.CAP_FFMPEG);
 		
 		logger.fine("video camera open:" + camera.isOpened());
@@ -173,9 +173,10 @@ public class TelloCamera implements TelloCameraInterface
 	    		{
 	    		    synchronized (this) { camera.read(imageRaw); }
 	    			
+	    		    // Resize raw image to window (frame) size.
 	    			Imgproc.resize(imageRaw, image, videoFrameSize);
 	
-	    		    // Draw target rectangles on image.
+	    		    // Draw target rectangles/contours on image.
 	    		    
 	    			if (targetRectangles != null)
 	    				for (Rect rect: targetRectangles) 
@@ -186,6 +187,8 @@ public class TelloCamera implements TelloCameraInterface
 	    			
 	    			if (contours != null) Imgproc.drawContours(image, contours, -1, contourColor, contourWidth);
 
+	    			// Draw status bar text on image.
+	    			
 	    			if (statusBar != null && statusBarMethod == null)
 	    				Imgproc.putText(image, statusBar, new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
 	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
@@ -194,12 +197,10 @@ public class TelloCamera implements TelloCameraInterface
 	    				Imgproc.putText(image, statusBarMethod.get(), new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
 	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
 
-	    			// write image to live window if open.
-	    		    
+	    			// Write image to live window if open.
 	    		    if (jFrame != null)	updateLiveWindow(image);
 	    			
 	    			// Write image to recording file if recording.
-	    			
 	    			if (recording) videoWriter.write(image);
 	    		}
 	    		
@@ -249,18 +250,16 @@ public class TelloCamera implements TelloCameraInterface
 	// Update the live window with the supplied image.
 	private void updateLiveWindow(Mat image)
 	{
-		Mat	imageSized = new Mat();
-		
 		try
 		{
-			// Resize image to fit current window size.
-			//Imgproc.resize(image, imageSized, new Size(jFrame.getWidth(), jFrame.getHeight()));
+			// Reset frame size to current window size, allows for window resize.
+			// Takes effect on next update.
 			videoFrameSize = new Size(jFrame.getWidth(), jFrame.getHeight());
 			
 	        // Convert image Mat to a jpeg image.
 	        Image img = HighGui.toBufferedImage(image);
 	        
-	        // Set label component of the live window to new image.
+	        // Set label component content of the live window to new image.
 	        jLabel.setIcon(new ImageIcon(img));
 		}
 		catch (Exception e) {logger.warning("live window update failed: " + e.toString());}
@@ -278,8 +277,10 @@ public class TelloCamera implements TelloCameraInterface
 			return result;
 		}
 		
+		// Determine folder and name of video file.
 		fileName = folder + "\\" + df.format(new Date()) + ".avi";
 
+		// Create a writer to write images to the file.
 		videoWriter = new VideoWriter(fileName, VideoWriter.fourcc('M', 'J', 'P', 'G'), videoFrameRate, 
 									  videoFrameSize, true);
 

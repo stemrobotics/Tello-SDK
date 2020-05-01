@@ -74,13 +74,17 @@ public class TelloCommunication implements TelloCommunicationInterface
     {
       logger.info("Connecting to drone...");
       
-      ds = new DatagramSocket(udpPort);
+      ds = new DatagramSocket(udpPort);	// new dg socket to send/receive commands.
+      
       ds.setSoTimeout(socketTimeout);	// timeout on socket operations.
+      
       ds.connect(ipAddress, udpPort);
       
       if (!ipAddress.isReachable(100)) throw new TelloConnectionException("Tello not responding");
       
-      dsStatus = new DatagramSocket(udpStatusPort);
+      dsStatus = new DatagramSocket(udpStatusPort);	// new dg socket to receive status feed.
+      
+      dsStatus.setSoTimeout(socketTimeout);	// timeout on socket operations.
       
       logger.info("Connected!");
     } catch (Exception e) {

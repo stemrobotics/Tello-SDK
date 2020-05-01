@@ -475,7 +475,12 @@ public class TelloControl implements TelloControlInterface
     			    drone.setMissionPadpry(mppry);
 	    		}
 	    	}
-	    	catch (Exception e) { logger.warning("status monitor failed: " + e.getMessage()); }
+	    	catch (Exception e) 
+	    	{ 
+	    		logger.warning("status monitor failed: " + e.getMessage()); 
+	    		// Error on status monitor most likely means drone has shut down.
+	    		drone.setConnection(TelloConnection.DISCONNECTED);
+	    	}
 	    	finally {}
 	    	
 	    	statusMonitorThread =  null;

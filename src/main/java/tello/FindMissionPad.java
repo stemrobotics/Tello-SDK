@@ -40,12 +40,6 @@ public class FindMissionPad
 		    
 		    telloControl.takeOff();
 		    
-		    telloControl.streamOn();
-		    
-		    camera.setStatusBar(this::updateWindow);
-		    
-		    camera.startVideoCapture(false);
-		    
 		    // Turn on Mission Pad detection and select camera to monitor.
 		    
 		    telloControl.setMissionMode(true, MissionDetectionCamera.downward);
@@ -110,14 +104,6 @@ public class FindMissionPad
     	telloControl.disconnect();
 	    
 	    logger.info("end");
-	}
-	
-	// Return a string of info for the status area on video feed.
-	
-	private String updateWindow()
-	{
-    	 return String.format("Batt: %d  Alt: %d  Hdg: %d", drone.getBattery(), drone.getHeight(), 
-    			drone.getHeading());
 	}
 	
 	// Thread class that runs in background and watches for the status feed from drone
