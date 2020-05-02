@@ -1,5 +1,6 @@
 package tellolib.drone;
 
+import org.bytedeco.opencv.opencv_core.*;
 import org.opencv.core.Core;
 
 import tellolib.communication.TelloConnection;
