@@ -1,7 +1,11 @@
 package tellolib.drone;
 
 import org.bytedeco.opencv.opencv_core.*;
+import org.bytedeco.opencv.opencv_imgproc.*;
 import org.opencv.core.Core;
+
+import static org.bytedeco.opencv.global.opencv_core.*;
+import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 import tellolib.communication.TelloConnection;
 
