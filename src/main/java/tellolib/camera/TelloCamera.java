@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -36,10 +37,9 @@ public class TelloCamera implements TelloCameraInterface
 	private boolean				recording;
 	private Thread				videoCaptureThread;
 	private VideoCapture		camera;
-	private Mat					image = new Mat();
+	private Mat					image;
 	private VideoWriter			videoWriter;
 	private Dimension 			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//	private Size				videoFrameSize = new Size(960, 670);
 	private Size				videoFrameSize = new Size(screenSize.width - 400, screenSize.height - 100);
 	private double				videoFrameRate = 30;
 	private SimpleDateFormat	df = new SimpleDateFormat("yyyy-MM-dd.HHmmss");
@@ -58,7 +58,10 @@ public class TelloCamera implements TelloCameraInterface
 	
 	private TelloCamera()
 	{
-
+		// Load OpenCV library.
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		
+		image = new Mat();
 	}
     
 	private static class SingletonHolder 
