@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-import java.awt.Toolkit.*;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,6 +23,7 @@ import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import tellolib.communication.TelloConnection;
 import tellolib.drone.TelloDrone;
 
 /**
@@ -97,6 +96,7 @@ public class TelloCamera implements TelloCameraInterface
 
 		if (liveWindow)
 		{
+			// Create window and image display component using Java Swing library.
 	        jFrame = new JFrame("Tello Controller Test");
 	        jFrame.setPreferredSize(new Dimension((int) videoFrameSize.width, (int) videoFrameSize.height));
 	        jLabel = new JLabel();
@@ -206,7 +206,11 @@ public class TelloCamera implements TelloCameraInterface
 	    		
 	    		logger.fine("Video capture thread ended");
 	    	}
-	    	catch (Exception e) { logger.warning("video capture failed: " + e.getMessage()); }
+	    	catch (Exception e) 
+	    	{ 
+	    		logger.severe("video capture failed: " + e.getMessage()); 
+	    		// Error on status monitor most likely means drone has shut down.
+	    		TelloDrone.getInstance().setConnection(TelloConnection.DISCONNECTED);	    	}
 	    	finally {}
 	    	
 	    	videoCaptureThread = null;

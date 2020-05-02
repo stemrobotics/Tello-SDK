@@ -11,7 +11,6 @@ import com.studiohartman.jamepad.ControllerState;
 import tellolib.camera.FaceDetection;
 import tellolib.camera.TelloCamera;
 import tellolib.command.TelloFlip;
-import tellolib.communication.TelloConnection;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
@@ -50,6 +49,8 @@ public class FindFace
 	    drone = TelloDrone.getInstance();
 	    
 	    camera = TelloCamera.getInstance();
+	    
+	    // Create instance of FaceDetection support class.
 	    
 	    faceDetector = FaceDetection.getInstance();
 	    		
@@ -127,25 +128,40 @@ public class FindFace
 		    			camera.startRecording(System.getProperty("user.dir") + "\\Photos");
 		    	}
 
+		    	// X button toggles face detection.
+		    	
 		    	if (currState.xJustPressed || detectFaces)
 		    	{
-		    		//logger.info("X pressed");
-		    		detectFaces = true;
+		    		// Toggle detectFaces on X button.
+		    		if (currState.xJustPressed) detectFaces = !detectFaces;
 		    		
-	    			camera.addTarget(null);
-	
+		    		// Call FaceDetection class to see if faces are present in the current
+		    		// video stream image.
 	    			found = faceDetector.detectFaces();
+	    			
+	    			int faceCount = 0;
 	    			
 	    			if (found)
 	    			{
-	    				int faceCount = faceDetector.getFaceCount();
+	    				// Clear any previous target rectangles.
+		    			camera.addTarget(null);
+		    			
+		    			// How many faces are detected? This is just information.
+	    				faceCount = faceDetector.getFaceCount();
 	
 	    				logger.info("face count=" + faceCount);
 	    				
+	    				// Get the array of rectangles describing the location and size
+	    				// of the detected faces.
 	    				Rect[] faces = faceDetector.getFaces();
 	    				
+	    				// Set first face rectangle to be drawn on video feed.
 	    				camera.addTarget(faces[0]);
-	    			}
+	    			} else 	
+	    				logger.info("face count=" + faceCount);
+	    			
+	    			// Clear any target rectangles if face detection is off.
+	    			if  (!detectFaces) camera.addTarget(null);
 		    	}
 		    	
     			// If flying, pass the controller joystick deflection to the drone via

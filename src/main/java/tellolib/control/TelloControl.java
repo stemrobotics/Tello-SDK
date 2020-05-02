@@ -477,7 +477,7 @@ public class TelloControl implements TelloControlInterface
 	    	}
 	    	catch (Exception e) 
 	    	{ 
-	    		logger.warning("status monitor failed: " + e.getMessage()); 
+	    		logger.severe("status monitor failed: " + e.getMessage()); 
 	    		// Error on status monitor most likely means drone has shut down.
 	    		drone.setConnection(TelloConnection.DISCONNECTED);
 	    	}
@@ -531,7 +531,12 @@ public class TelloControl implements TelloControlInterface
 	    		}
 	    	}
 	    	catch (InterruptedException e) {}
-	    	catch (Exception e) { logger.warning("keepalive failed: " + e.getMessage()); }
+	    	catch (Exception e) 
+	    	{ 
+	    		logger.severe("keepalive failed: " + e.getMessage()); 
+	    		// Error on status monitor most likely means drone has shut down.
+	    		drone.setConnection(TelloConnection.DISCONNECTED);	    		
+	    	}
 	    	
 	    	keepAliveThread =  null;
 	    }

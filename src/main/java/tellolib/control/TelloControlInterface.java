@@ -246,7 +246,8 @@ public interface TelloControlInterface
   /**
    * Stop monitoring the status updates sent by the Tello.
    * Requires SDK 1.3 or later. Monitor will be stopped when
-   * disconnect() is called.
+   * disconnect() is called. Monitor will set drone connection 
+   * state to disconnected if it detects loss of status updates.
    */
   void stopStatusMonitor();
   
@@ -254,6 +255,8 @@ public interface TelloControlInterface
    * Start keep alive thread that pings the Tello every 10 seconds
    * with a get battery level command to keep the Tello from shutting
    * down automatically if it receives no commands for 15 seconds.
+   * Thread will set drone connection state to disconnected if 
+   * it detects an error on ping of drone.
    */
   void startKeepAlive();
   
