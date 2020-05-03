@@ -246,7 +246,7 @@ public interface TelloControlInterface
   /**
    * Stop monitoring the status updates sent by the Tello.
    * Requires SDK 1.3 or later. Monitor will be stopped when
-   * disconnect() is called. Monitor will set drone connection 
+   * {@link #disconnect()} is called. Monitor will set drone connection 
    * state to disconnected if it detects loss of status updates.
    */
   void stopStatusMonitor();
