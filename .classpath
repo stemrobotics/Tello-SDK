@@ -20,8 +20,16 @@
 	<classpathentry kind="lib" path="Jamepad.jar"/>
 	<classpathentry kind="lib" path="Javacv/ffmpeg-windows-x86_64.jar"/>
 	<classpathentry kind="lib" path="Javacv/ffmpeg.jar"/>
+	<classpathentry kind="lib" path="Javacv/javacpp-platform.jar"/>
+	<classpathentry kind="lib" path="Javacv/javacpp-windows-x86_64.jar"/>
 	<classpathentry kind="lib" path="Javacv/javacpp.jar"/>
+	<classpathentry kind="lib" path="Javacv/javacv-platform.jar"/>
+	<classpathentry kind="lib" path="Javacv/javacv.jar"/>
+	<classpathentry kind="lib" path="Javacv/openblas-platform.jar"/>
+	<classpathentry kind="lib" path="Javacv/openblas-windows-x86_64.jar"/>
+	<classpathentry kind="lib" path="Javacv/openblas.jar"/>
+	<classpathentry kind="lib" path="Javacv/opencv-platform.jar"/>
 	<classpathentry kind="lib" path="Javacv/opencv-windows-x86_64.jar"/>
-	<classpathentry kind="lib" path="Javacv/opencv_java430.jar"/>
+	<classpathentry kind="lib" path="Javacv/opencv.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
