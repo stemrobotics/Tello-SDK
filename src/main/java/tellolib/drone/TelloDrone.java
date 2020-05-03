@@ -7,6 +7,9 @@ import org.opencv.core.Core;
 import static org.bytedeco.opencv.global.opencv_core.*;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import tellolib.communication.TelloConnection;
 
 /**
@@ -15,6 +18,8 @@ import tellolib.communication.TelloConnection;
  */
 public class TelloDrone implements TelloDroneInterface
 {
+	private final 				Logger logger = Logger.getLogger("Tello");
+
   /*
    * Connection IP address.
    */
@@ -40,6 +45,10 @@ public class TelloDrone implements TelloDroneInterface
 	
   private TelloDrone() 
   {
+	logger.setLevel(Level.INFO);
+	logger.getHandlers()[0].setLevel(Level.INFO);
+	logger.severe(Core.NATIVE_LIBRARY_NAME);
+	logger.info("---");
 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	
     telloConnection = TelloConnection.DISCONNECTED;
