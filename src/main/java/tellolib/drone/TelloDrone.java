@@ -33,13 +33,13 @@ public class TelloDrone implements TelloDroneInterface
 	
   private TelloDrone() 
   {
-    telloConnection = TelloConnection.DISCONNECTED;
-    telloMode = TelloMode.NORMAL;
+	  telloConnection = TelloConnection.DISCONNECTED;
+	  telloMode = TelloMode.NORMAL;
   }
   
   private static class SingletonHolder 
   {
-    public static final TelloDrone INSTANCE = new TelloDrone();
+	  public static final TelloDrone INSTANCE = new TelloDrone();
   }
 	
   /**
@@ -48,231 +48,231 @@ public class TelloDrone implements TelloDroneInterface
    */
   public static TelloDrone getInstance()
   {
-    return SingletonHolder.INSTANCE;
+	  return SingletonHolder.INSTANCE;
   }
 
   @Override
   public Integer getBattery() 
   {
-    return battery;
+	  return battery;
   }
 
   @Override
   public void setBattery(Integer battery) 
   {
-    this.battery = battery;
+	  this.battery = battery;
   }
 
   @Override
   public Integer getSpeed() 
   {
-    return speed;
+	  return speed;
   }
 
   @Override
   public void setSpeed(Integer speed) 
   {
-    this.speed = speed;
+	  this.speed = speed;
   }
 
   @Override
   public Integer getTime() 
   {
-    return time;
+	  return time;
   }
 
   @Override
   public void setTime(Integer time) 
   {
-    this.time = time;
+	  this.time = time;
   }
 
   @Override
   public TelloConnection getConnection() 
   {
-    return telloConnection;
+	  return telloConnection;
   }
 
   @Override
   public void setConnection(TelloConnection telloConnection) 
   {
-    this.telloConnection = telloConnection;
+	  this.telloConnection = telloConnection;
   }
 
   @Override
   public TelloMode getMode() 
   {
-    return telloMode;
+	  return telloMode;
   }
 
   @Override
   public void setMode(TelloMode telloMode) 
   {
-    this.telloMode = telloMode;
+	  this.telloMode = telloMode;
   }
 
   @Override
   public void setTemp( int temp )
   {
-	this.temp = temp;
+	  this.temp = temp;
   }
 
   @Override
   public int getTemp()
   {
-	return temp;
+	  return temp;
   }
 
   @Override
   public void setBarometer( double barometer )
   {
-	this.barometer = barometer;
+	  this.barometer = barometer;
   }
 
   @Override
   public double getBarometer()
   {
-	return barometer;
+	  return barometer;
   }
 
   @Override
   public void setTof( double tof )
   {
-	this.tof = tof;
+	  this.tof = tof;
   }
 
   @Override
   public double getTof()
   {
-	return tof;
+	  return tof;
   }
 
   @Override
   public void setSN( String sn )
   {
-	this.sn = sn;
+	  this.sn = sn;
   }
 
   @Override
   public String getSN()
   {
-	return sn;
+	  return sn;
   }
 
   @Override
   public void setHeight( int height )
   {
-	this.height = height;
+	  this.height = height;
   }
 
   @Override
   public int getHeight()
   {
-	return height;
+	  return height;
   }
 
   @Override
   public void setAttitude( int[] pry )
   {
-	attitude = pry;
+	  attitude = pry;
 	
-	updateHeading();
+	  updateHeading();
   }
 
   @Override
   public int[] getAttitude()
   {
-	return attitude;
+	  return attitude;
   }
 
   @Override
   public void setAcceleration( double[] xyz )
   {
-	acceleration = xyz;
+	  acceleration = xyz;
   }
 
   @Override
   public double[] getAcceleration()
   {
-	return acceleration;
+	  return acceleration;
   }
 
   @Override
   public void setSDK( String sdk )
   {
-	this.sdk = sdk;
+	  this.sdk = sdk;
   }
 
   @Override
   public String getSDK()
   {
-	return sdk;
+	  return sdk;
   }
 
   @Override
   public void setVelocity( double[] xyz )
   {
-    this.velocity = xyz;
+	  this.velocity = xyz;
   }
 
   @Override
   public double[] getVelocity()
   {
-	return velocity;
+	  return velocity;
   }
 
   @Override
   public void setMissionMode( boolean enabled )
   {
-	missionModeEnabled = enabled;
+	  missionModeEnabled = enabled;
   }
 
   @Override
   public boolean isMissionModeEnabled()
   {
-	return missionModeEnabled;
+	  return missionModeEnabled;
   }
 
   @Override
   public void setMissionPadId( int id )
   {
-	missionPadId = id;
+	  missionPadId = id;
   }
 
   @Override
   public int getMissionPadId()
   {
-	return missionPadId;
+	  return missionPadId;
   }
 
   @Override
   public void setMissionPadxyz( int[] xyz )
   {
-    missionPadxyz = xyz;
+	  missionPadxyz = xyz;
   }
 
   @Override
   public int[] getMissionPadxyz()
   {
-	return missionPadxyz;
+	  return missionPadxyz;
   }
 
   @Override
   public void setMissionPadpry( int[] pry )
   {
-    missionPadpry = pry;	
+	  missionPadpry = pry;	
   }
 
   @Override
   public int[] getMissionPadpry()
   {
-	return missionPadpry;
+	  return missionPadpry;
   }
 
   @Override
   public int getRawYaw()
   {
-	return getAttitude()[2];
+	  return getAttitude()[2];
   }
   
   private void updateHeading()
@@ -341,12 +341,12 @@ public class TelloDrone implements TelloDroneInterface
 	  return flying;
   }
 
-@Override
-public boolean isConnected()
-{
-	if (telloConnection == TelloConnection.CONNECTED)
-		return true;
-	else
-		return false;
-}
+  @Override
+  public boolean isConnected()
+  {
+	  if (telloConnection == TelloConnection.CONNECTED)
+		  return true;
+	  else
+		  return false;
+  }
 }
