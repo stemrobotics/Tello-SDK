@@ -19,8 +19,9 @@ public interface TelloCameraInterface
    * Thread will set drone connection state to disconnected if it
    * detects the stream has stopped.
    * @param liveWindow True to display video feed in a live window.
+   * @throws Exception 
    */
-  void startVideoCapture(boolean liveWindow);
+  void startVideoCapture(boolean liveWindow) throws Exception;
   
   /**
    * Stop video stream capture thread.

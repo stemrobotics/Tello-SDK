@@ -81,6 +81,8 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public void disconnect() 
 	{
+		logger.fine("disconnecting");
+		
 		stopStatusMonitor();
 		stopKeepAlive();
 		camera.stopVideoCapture();
@@ -89,7 +91,7 @@ public class TelloControl implements TelloControlInterface
 		// returned by land if we have already landed or never took off.
 		  
 		try { land(); } catch (Exception e) {}
-		  
+	
 		communication.disconnect();
 		drone.setConnection(TelloConnection.DISCONNECTED);
 	}

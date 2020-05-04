@@ -12,6 +12,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.OpenCVFrameConverter.ToOrgOpenCvCoreMat;
+
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -21,9 +25,7 @@ import org.opencv.core.Size;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
-import org.opencv.videoio.Videoio;
 
 import tellolib.communication.TelloConnection;
 import tellolib.drone.TelloDrone;
@@ -37,7 +39,7 @@ public class TelloCamera implements TelloCameraInterface
 
 	private boolean				recording;
 	private Thread				videoCaptureThread;
-	private VideoCapture		camera;
+	private FFmpegFrameGrabber	camera;
 	private Mat					image = new Mat();
 	private VideoWriter			videoWriter;
 	private Dimension 			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -78,21 +80,25 @@ public class TelloCamera implements TelloCameraInterface
 	}
 	
 	@Override
-	public void startVideoCapture(boolean liveWindow)
+	public void startVideoCapture(boolean liveWindow) throws Exception
 	{
 		logger.fine("starting video capture");
 		
 		if (camera != null) return;
 		
 		// Create VideoCapture object to accept video feed from drone.
-		camera = new VideoCapture();
+		camera = new FFmpegFrameGrabber("udp://0.0.0.0:" + Integer.toString(TelloDrone.UDP_VIDEO_PORT)) ;
 		
-	 	camera.setExceptionMode(true);
+		//av_log_set_level(AV_LOG_QUIET);
+		
+		camera.start();
+		
+	 	//camera.setExceptionMode(true);
 
 	 	// Start capture object listening for video packets.
-		camera.open("udp://0.0.0.0:" + Integer.toString(TelloDrone.UDP_VIDEO_PORT), Videoio.CAP_FFMPEG);
+		//camera.open("udp://0.0.0.0:" + Integer.toString(TelloDrone.UDP_VIDEO_PORT), Videoio.CAP_FFMPEG);
 		
-		logger.fine("video camera open:" + camera.isOpened());
+		logger.fine("video camera open:" + camera.hasVideo());
 
 		// Create window to display live video feed.
 
@@ -130,8 +136,16 @@ public class TelloCamera implements TelloCameraInterface
 			jFrame.setVisible(false);
 			jFrame.dispose();
 		}
-		
-		camera.release();
+	
+		try
+		{
+			camera.stop();
+			camera.release();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 		image.release();
 		image = null;
 		camera = null;
@@ -162,9 +176,10 @@ public class TelloCamera implements TelloCameraInterface
 		
 	    public void run()
 	    {
-	    	Mat	imageRaw = new Mat();
-	    	
-			logger.fine("video capture thread started");
+	    	Mat		imageRaw = null;
+	    	Frame	frame;
+			
+	    	logger.fine("video capture thread started");
 			
 	    	try
 	    	{
@@ -173,10 +188,13 @@ public class TelloCamera implements TelloCameraInterface
 	    		
 	    		while (!isInterrupted())
 	    		{
-	    		    synchronized (this) { camera.read(imageRaw); }
-	    			
+	    			logger.info("grab frame");
+	    		    synchronized (this) { frame = camera.grab(); }
+	    		    
+	    		    imageRaw = new ToOrgOpenCvCoreMat().convert(frame);
+	    		    
 	    		    // Resize raw image to window (frame) size.
-	    			Imgproc.resize(imageRaw, image, videoFrameSize);
+	    		    Imgproc.resize(imageRaw, image, videoFrameSize);
 	
 	    		    // Draw target rectangles/contours on image.
 	    		    
@@ -205,6 +223,8 @@ public class TelloCamera implements TelloCameraInterface
 	    			// Write image to recording file if recording.
 	    			if (recording) videoWriter.write(image);
 	    		}
+	    		
+	    		imageRaw.release();
 	    		
 	    		logger.fine("Video capture thread ended");
 	    	}
@@ -287,8 +307,8 @@ public class TelloCamera implements TelloCameraInterface
 		fileName = folder + "\\" + df.format(new Date()) + ".avi";
 
 		// Create a writer to write images to the file.
-		videoWriter = new VideoWriter(fileName, VideoWriter.fourcc('M', 'J', 'P', 'G'), videoFrameRate, 
-									  videoFrameSize, true);
+//		videoWriter = new VideoWriter(fileName, VideoWriter.fourcc('M', 'J', 'P', 'G'), videoFrameRate, 
+//									  videoFrameSize, true);
 
 		if (videoWriter != null && videoWriter.isOpened())
 		{
@@ -364,7 +384,7 @@ public class TelloCamera implements TelloCameraInterface
 	{
 		if (image == null) return new Size(0,0);
 		
-		return new Size(image.width(), image.height());
+		return image.size();	//new Size(image..width(), image.height());
 	}
 
 	@Override
