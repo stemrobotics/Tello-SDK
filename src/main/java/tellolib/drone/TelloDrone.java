@@ -1,11 +1,5 @@
 package tellolib.drone;
 
-import org.bytedeco.javacpp.Loader;
-import org.bytedeco.opencv.opencv_java;
-import org.bytedeco.opencv.opencv_core.*;
-import org.bytedeco.opencv.opencv_imgproc.*;
-import org.opencv.core.Core;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,9 +38,6 @@ public class TelloDrone implements TelloDroneInterface
 	
   private TelloDrone() 
   {
-	Loader.load(opencv_java.class);
-	//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-	
     telloConnection = TelloConnection.DISCONNECTED;
     telloMode = TelloMode.NORMAL;
   }

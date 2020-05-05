@@ -12,9 +12,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter.ToOrgOpenCvCoreMat;
+import org.bytedeco.opencv.opencv_java;
+import static org.bytedeco.ffmpeg.global.avutil.*;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -40,12 +43,11 @@ public class TelloCamera implements TelloCameraInterface
 	private boolean				recording;
 	private Thread				videoCaptureThread;
 	private FFmpegFrameGrabber	camera;
-	private Mat					image = new Mat();
+	private Mat					image;
 	private VideoWriter			videoWriter;
 	private Dimension 			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 //	private Size				videoFrameSize = new Size(960, 670);
 	private Size				videoFrameSize = new Size(screenSize.width - 400, screenSize.height - 100);
-	private double				videoFrameRate = 30;
 	private SimpleDateFormat	df = new SimpleDateFormat("yyyy-MM-dd.HHmmss");
 	private JFrame				jFrame;
 	private JLabel				jLabel;
@@ -62,7 +64,13 @@ public class TelloCamera implements TelloCameraInterface
 	
 	private TelloCamera()
 	{
-
+		logger.fine("loading OpenCV...");
+		
+		Loader.load(opencv_java.class);
+		
+		logger.fine("load complete");
+		
+		image = new Mat();
 	}
     
 	private static class SingletonHolder 
@@ -89,7 +97,7 @@ public class TelloCamera implements TelloCameraInterface
 		// Create VideoCapture object to accept video feed from drone.
 		camera = new FFmpegFrameGrabber("udp://0.0.0.0:" + Integer.toString(TelloDrone.UDP_VIDEO_PORT)) ;
 		
-		//av_log_set_level(AV_LOG_QUIET);
+		av_log_set_level(AV_LOG_QUIET);
 		
 		camera.start();
 		
@@ -137,16 +145,6 @@ public class TelloCamera implements TelloCameraInterface
 			jFrame.dispose();
 		}
 	
-		try
-		{
-			camera.stop();
-			camera.release();
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		image.release();
 		image = null;
 		camera = null;
 	}
@@ -188,9 +186,10 @@ public class TelloCamera implements TelloCameraInterface
 	    		
 	    		while (!isInterrupted())
 	    		{
-	    			logger.info("grab frame");
+	    			// Get next image (frame) from stream.
 	    		    synchronized (this) { frame = camera.grab(); }
 	    		    
+	    		    // Convert Javacv Frame to opencv Mat.
 	    		    imageRaw = new ToOrgOpenCvCoreMat().convert(frame);
 	    		    
 	    		    // Resize raw image to window (frame) size.
@@ -224,14 +223,12 @@ public class TelloCamera implements TelloCameraInterface
 	    			if (recording) videoWriter.write(image);
 	    		}
 	    		
-	    		imageRaw.release();
-	    		
 	    		logger.fine("Video capture thread ended");
 	    	}
 	    	catch (Exception e) 
 	    	{ 
-	    		logger.severe("video capture failed: " + e.getMessage()); 
-	    		// Error on status monitor most likely means drone has shut down.
+	    		if (e.getMessage() != null) logger.severe("video capture failed: " + e.getMessage()); 
+	    		// Error on video capture most likely means drone has shut down.
 	    		TelloDrone.getInstance().setConnection(TelloConnection.DISCONNECTED);	    	}
 	    	finally {}
 	    	

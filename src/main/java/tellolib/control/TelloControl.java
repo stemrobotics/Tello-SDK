@@ -42,6 +42,9 @@ public class TelloControl implements TelloControlInterface
 		handler.setLevel(Level.OFF);
 		logger.addHandler(handler);
 		logger.setUseParentHandlers(false);
+
+		logger.setLevel(Level.FINE);
+		handler.setLevel(Level.FINE);
 		  
 		drone = TelloDrone.getInstance();
 		  
@@ -87,10 +90,9 @@ public class TelloControl implements TelloControlInterface
 		stopKeepAlive();
 		camera.stopVideoCapture();
 		  
-		// This will land if we are still flying and throw away the error
-		// returned by land if we have already landed or never took off.
+		// This will land if we are still flying.
 		  
-		try { land(); } catch (Exception e) {}
+		if (drone.isConnected() && drone.isFlying()) land();
 	
 		communication.disconnect();
 		drone.setConnection(TelloConnection.DISCONNECTED);
@@ -396,11 +398,16 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public void stopStatusMonitor()
 	{
-		if (statusMonitorThread != null) statusMonitorThread.interrupt();
-
-		logger.fine("stopping status monitor thread");
+		if (statusMonitorThread != null) 			
+		{
+			logger.fine("stopping status monitor thread");
 		
-		statusMonitorThread = null;
+			try
+			{
+				statusMonitorThread.interrupt();
+				statusMonitorThread.join();
+			} catch (InterruptedException e) {e.printStackTrace();}
+		}
 	}
 	
 	private class StatusMonitor extends Thread
@@ -479,7 +486,8 @@ public class TelloControl implements TelloControlInterface
 	    	}
 	    	catch (Exception e) 
 	    	{ 
-	    		logger.severe("status monitor failed: " + e.getMessage()); 
+	    		//if (!e.getMessage().startsWith("socket closed")) 
+	    			logger.severe("status monitor failed: " + e.getMessage()); 
 	    		// Error on status monitor most likely means drone has shut down.
 	    		drone.setConnection(TelloConnection.DISCONNECTED);
 	    	}
@@ -503,11 +511,16 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public void stopKeepAlive()
 	{
-		if (keepAliveThread != null) keepAliveThread.interrupt();
-
-		logger.fine("stopping keepalive thread");
+		if (keepAliveThread != null) 			
+		{
+			logger.fine("stopping keep alive thread");
 		
-		keepAliveThread = null;
+			try
+			{
+				keepAliveThread.interrupt();
+				keepAliveThread.join();
+			} catch (InterruptedException e) {e.printStackTrace();}
+		}
 	}
 	
 	private class KeepAlive extends Thread
