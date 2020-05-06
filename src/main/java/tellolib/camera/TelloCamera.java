@@ -121,10 +121,19 @@ public class TelloCamera implements TelloCameraInterface
 		if (camera == null) return;
 
 		if (recording) stopRecording();
-
-		logger.fine("stopping video capture thread");
 		
-		if (videoCaptureThread != null) videoCaptureThread.interrupt();
+		if (videoCaptureThread != null)
+		{
+			logger.fine("stopping video capture thread");
+
+			try
+			{
+				// Signal thread to stop.
+				videoCaptureThread.interrupt();
+				// Wait at most 2 sec for thread to stop.
+				videoCaptureThread.join(2000);
+			} catch (Exception e) {e.printStackTrace();}
+		}
 		
 		if (jFrame != null) 
 		{

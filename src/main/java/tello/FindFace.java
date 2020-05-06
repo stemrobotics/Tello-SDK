@@ -73,7 +73,7 @@ public class FindFace
 		    telloControl.connect();
 		    
 		    telloControl.enterCommandMode();
-		    
+		   
 		    telloControl.startStatusMonitor();
 		    
 		    telloControl.streamOn();

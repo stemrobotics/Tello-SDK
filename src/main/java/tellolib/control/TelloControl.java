@@ -85,10 +85,9 @@ public class TelloControl implements TelloControlInterface
 		stopKeepAlive();
 		camera.stopVideoCapture();
 		  
-		// This will land if we are still flying and throw away the error
-		// returned by land if we have already landed or never took off.
-		  
-		try { land(); } catch (Exception e) {}
+		// This will land if we are still flying.
+
+		if (drone.isConnected() && drone.isFlying()) land(); 
 		  
 		communication.disconnect();
 		drone.setConnection(TelloConnection.DISCONNECTED);
@@ -394,9 +393,18 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public void stopStatusMonitor()
 	{
-		if (statusMonitorThread != null) statusMonitorThread.interrupt();
-
-		logger.fine("stopping status monitor thread");
+		if (statusMonitorThread != null)
+		{
+			logger.fine("stopping status monitor thread");
+			
+			try
+			{
+				// Signal thread to stop.
+				statusMonitorThread.interrupt();
+				// Wait for thread to stop.
+				statusMonitorThread.join();
+			} catch (Exception e) {e.printStackTrace();}
+		}
 		
 		statusMonitorThread = null;
 	}
@@ -412,7 +420,7 @@ public class TelloControl implements TelloControlInterface
 		
 	    public void run()
 	    {
-			logger.fine("monitor thread start");
+			logger.fine("status monitor thread start");
 			
 	    	try
 	    	{
@@ -501,9 +509,18 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public void stopKeepAlive()
 	{
-		if (keepAliveThread != null) keepAliveThread.interrupt();
-
-		logger.fine("stopping keepalive thread");
+		if (keepAliveThread != null)
+		{
+			logger.fine("stopping keepalive thread");
+			
+			try
+			{
+				// Signal thread to stop.
+				keepAliveThread.interrupt();
+				// Wait for thread to stop.
+				keepAliveThread.join();
+			} catch (Exception e) {e.printStackTrace();}
+		}
 		
 		keepAliveThread = null;
 	}

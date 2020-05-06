@@ -18,6 +18,7 @@ public class FaceDetection implements FaceDetectionInterface
 	private final Logger		logger = Logger.getLogger("Tello");
 	
 	private CascadeClassifier	faceCascade = new CascadeClassifier();
+	private CascadeClassifier	profileCascade = new CascadeClassifier();
 	
 	private Rect[] 				facesArray = null;
 	
@@ -29,6 +30,13 @@ public class FaceDetection implements FaceDetectionInterface
 		logger.fine("classifier path=" + classifierPath);
 		
 		faceCascade.load(classifierPath);
+		
+		classifierPath = basePath + "\\src\\resources\\haarcascade_profileface.xml";
+		
+		logger.fine("classifier path=" + classifierPath);
+		
+		profileCascade.load(classifierPath);
+
 	}
     
 	private static class SingletonHolder 
@@ -77,12 +85,22 @@ public class FaceDetection implements FaceDetectionInterface
 				
 		//logger.fine("face size=" + absoluteFaceSize + ";height=" + height);
 		
-		// detect faces
+		// detect faces frontal classifier.
 		faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(absoluteFaceSize, absoluteFaceSize), new Size(height,height));
 		
 		// each rectangle in faces is a face.
 		facesArray = faces.toArray();
+		
+		if (facesArray.length == 0)
+		{
+			// detect faces profile classifier.
+			profileCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
+					new Size(absoluteFaceSize, absoluteFaceSize), new Size(height,height));
+			
+			// each rectangle in faces is a face.
+			facesArray = faces.toArray();
+		}
 		
 		logger.finer("faces detected = " + facesArray.length);		
 		
