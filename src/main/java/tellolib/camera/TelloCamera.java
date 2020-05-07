@@ -101,11 +101,6 @@ public class TelloCamera implements TelloCameraInterface
 		
 		camera.start();
 		
-	 	//camera.setExceptionMode(true);
-
-	 	// Start capture object listening for video packets.
-		//camera.open("udp://0.0.0.0:" + Integer.toString(TelloDrone.UDP_VIDEO_PORT), Videoio.CAP_FFMPEG);
-		
 		logger.fine("video camera open:" + camera.hasVideo());
 
 		// Create window to display live video feed.
@@ -137,6 +132,18 @@ public class TelloCamera implements TelloCameraInterface
 
 		logger.fine("stopping video capture thread");
 		
+		// For normal shutdown, interrupt works fine. If we are shutting down
+		// due to loss of connection or feed from the drone, the capture thread
+		// will hang on the frame grab (no timeout and no apparent way to set one)
+		// and all attempts to pop the grab wait or kill the thread don't work.
+		// So the main thread will end but capture thread will hang around and
+		// the program will show still running in the console window. You can
+		// just run it again and it appears to work fine with new execution but
+		// its not clear what happens to the zombie thread. You might also get a
+		// connection fail due to address already bound and have to restart Eclipse
+		// but a restart appears to work most of the time. Note the failure of the
+		// image grab to timeout is a quirk of Javacv implementation.
+		
 		if (videoCaptureThread != null) videoCaptureThread.interrupt();
 		
 		if (jFrame != null) 
@@ -144,7 +151,7 @@ public class TelloCamera implements TelloCameraInterface
 			jFrame.setVisible(false);
 			jFrame.dispose();
 		}
-	
+		
 		image = null;
 		camera = null;
 	}
