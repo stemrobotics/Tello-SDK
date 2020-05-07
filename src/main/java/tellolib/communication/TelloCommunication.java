@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * Low level support interface for sending and receiving data from DJI Tello drone.
+ * Low level support interface for sending and receiving data from Tello drone.
  */
 public class TelloCommunication implements TelloCommunicationInterface
 {

@@ -4,7 +4,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 
 /**
- * Face detection with OpenCV.
+ * Convenience functions for Face detection with OpenCV.
  */
 public interface FaceDetectionInterface
 {

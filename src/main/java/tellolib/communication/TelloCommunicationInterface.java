@@ -7,7 +7,7 @@ import java.util.Map;
 import tellolib.command.TelloCommandInterface;
 
 /**
- * Low level support interface for sending and receiving data from DJI Tello drone.
+ * Low level support interface for sending and receiving data from Tello drone.
  */
 public interface TelloCommunicationInterface
 {

@@ -29,12 +29,14 @@ public class FaceDetection implements FaceDetectionInterface
 		
 		logger.fine("classifier path=" + classifierPath);
 		
+		// Load classifier for faces viewed from the front.
 		faceCascade.load(classifierPath);
 		
 		classifierPath = basePath + "\\src\\resources\\haarcascade_profileface.xml";
 		
 		logger.fine("classifier path=" + classifierPath);
 		
+		// Load classifier for faes viewed from the side.
 		profileCascade.load(classifierPath);
 
 	}

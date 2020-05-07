@@ -157,8 +157,7 @@ public class FindFace
 	    				
 	    				// Set first face rectangle to be drawn on video feed.
 	    				camera.addTarget(faces[0]);
-	    			} else 	
-	    				logger.info("face count=" + faceCount);
+	    			}
 	    			
 	    			// Clear any target rectangles if face detection is off.
 	    			if  (!detectFaces) camera.addTarget(null);
