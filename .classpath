@@ -6,6 +6,13 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-10">
 		<attributes>
 			<attribute name="module" value="true"/>
@@ -18,25 +25,16 @@
 	<classpathentry kind="lib" path="Javacv/javacpp-platform.jar"/>
 	<classpathentry kind="lib" path="Javacv/javacpp-windows-x86_64.jar"/>
 	<classpathentry kind="lib" path="Javacv/javacpp.jar"/>
-	<classpathentry kind="lib" path="Javacv/javacv-platform.jar"/>
-	<classpathentry kind="lib" path="Javacv/javacv.jar"/>
-	<classpathentry kind="lib" path="Javacv/openblas-platform.jar"/>
-	<classpathentry kind="lib" path="Javacv/openblas-windows-x86_64.jar"/>
-	<classpathentry kind="lib" path="Javacv/openblas.jar"/>
 	<classpathentry kind="lib" path="Javacv/opencv-platform.jar"/>
 	<classpathentry kind="lib" path="Javacv/opencv-windows-x86_64.jar"/>
 	<classpathentry kind="lib" path="Javacv/opencv.jar"/>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
-		<attributes>
-			<attribute name="test" value="true"/>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="Javacv/javacv.jar"/>
+	<classpathentry kind="lib" path="Javacv/openblas.jar"/>
+	<classpathentry kind="lib" path="Javacv/openblas-platform.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
