@@ -214,6 +214,9 @@ public class FindFace2
     			drone.getHeading(), drone.isFlying());
 	}
 
+	// Class with a class, called a nested or inner class. It has the features of
+	// the Java Tread class and our code to run in the thread.
+	
 	private class CheckForFaces extends Thread
 	{
 		public void run()
