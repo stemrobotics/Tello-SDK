@@ -3,16 +3,18 @@ package tello;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.opencv.core.Rect;
+
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
+import tellolib.camera.FaceDetection;
 import tellolib.camera.TelloCamera;
 import tellolib.command.TelloFlip;
-import tellolib.communication.TelloConnection;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
-public class FlyController
+public class FindFace2
 {
 	private final Logger logger = Logger.getGlobal(); 
 
@@ -20,15 +22,15 @@ public class FlyController
 	private TelloDrone			drone;
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
+	private FaceDetection		faceDetector;
 
 	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
+		Thread	checkForFacesThread = null;
+		boolean	detectFaces = false, found = false;
 
 		logger.info("start");
-
-	    // Create game pad class from the Jamepad library included in this project.
-	    // The class supports multiple controllers.
 	    
 	    controllers = new ControllerManager();
 		controllers.initSDLGamepad();
@@ -44,7 +46,11 @@ public class FlyController
 	    drone = TelloDrone.getInstance();
 	    
 	    camera = TelloCamera.getInstance();
-
+	    
+	    // Create instance of FaceDetection support class.
+	    
+	    faceDetector = FaceDetection.getInstance();
+	    		
 	    telloControl.setLogLevel(Level.FINE);
 		
 		// Controller mapping:
@@ -52,8 +58,9 @@ public class FlyController
 		// Back button  = land
 		// A button     = take picture
 	    // B button     = toggle video recording
+	    // X button     = toggle marker detection mode
 	    // Y button     = stop, go into hover
-	    // Dpad.up      = flip forward
+		// Dpad.up      = flip forward
 		//
 		// right joystick Y axis = forward/backward
 		// right joystick X axis = left/right
@@ -66,7 +73,7 @@ public class FlyController
 		    telloControl.connect();
 		    
 		    telloControl.enterCommandMode();
-		    
+		   
 		    telloControl.startStatusMonitor();
 		    
 		    telloControl.streamOn();
@@ -77,7 +84,7 @@ public class FlyController
 		   
 		    // Now we loop until land button is pressed or we lose connection.
 		    
-		    while(telloControl.getConnection() == TelloConnection.CONNECTED) 
+		    while(drone.isConnected()) 
 		    {
 		    	// Read the current state of the first (and in our case only)
 		    	// game pad.
@@ -121,7 +128,28 @@ public class FlyController
 		    			camera.startRecording(System.getProperty("user.dir") + "\\Photos");
 		    	}
 
-		    	// If flying, pass the controller joystick deflection to the drone via
+		    	// X button toggles face detection.
+		    	
+		    	if (currState.xJustPressed)
+		    	{
+		    		// Toggle detectFaces on X button.
+		    		detectFaces = !detectFaces;
+		    		
+		    		// If true, we start thread to watch for faces else we would
+		    		// already have thread running to we signal it to stop.
+	    			if (detectFaces)
+	    			{
+	    				checkForFacesThread = new CheckForFaces();
+	    				checkForFacesThread.start();
+	    			}
+	    			else 
+	    				checkForFacesThread.interrupt();
+	    			
+	    			// Clear any target rectangles if face detection is off.
+	    			if  (!detectFaces) camera.addTarget(null);
+		    	}
+		    	
+    			// If flying, pass the controller joystick deflection to the drone via
 		    	// the flyRC command.
 		    	
 		    	if (drone.isFlying())
@@ -154,7 +182,7 @@ public class FlyController
 	    	e.printStackTrace();
 	    } finally 
 	    {
-	    	if (telloControl.getConnection() == TelloConnection.CONNECTED && drone.isFlying())
+	    	if (drone.isConnected() && drone.isFlying())
 	    	{
 	    		try
 	    		{telloControl.land();}
@@ -184,6 +212,40 @@ public class FlyController
 	{
     	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b", drone.getBattery(), drone.getHeight(), 
     			drone.getHeading(), drone.isFlying());
+	}
+
+	private class CheckForFaces extends Thread
+	{
+		public void run()
+		{
+			boolean	found;
+			int		faceCount;
+			
+			while (!isInterrupted())
+			{
+				// Call FaceDetection class to see if faces are present in the current
+				// video stream image.
+				found = faceDetector.detectFaces();
+		
+				// Clear any previous target rectangles.
+				camera.addTarget(null);
+				
+				if (found)
+				{
+					// How many faces are detected? This is just information.
+					faceCount = faceDetector.getFaceCount();
+		
+					logger.finer("face count=" + faceCount);
+					
+					// Get the array of rectangles describing the location and size
+					// of the detected faces.
+					Rect[] faces = faceDetector.getFaces();
+					
+					// Set first face rectangle to be drawn on video feed.
+					camera.addTarget(faces[0]);
+				}
+			}
+		}
 	}
 }
 

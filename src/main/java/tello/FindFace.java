@@ -23,17 +23,14 @@ public class FindFace
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
 	private FaceDetection		faceDetector;
-	private boolean				found;
 
 	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
-		boolean	detectFaces = false;
+		int		faceCount;
+		boolean	detectFaces = false, found = false;
 
 		logger.info("start");
-
-	    // Create game pad class from the Jamepad library included in this project.
-	    // The class supports multiple controllers.
 	    
 	    controllers = new ControllerManager();
 		controllers.initSDLGamepad();
@@ -60,6 +57,9 @@ public class FindFace
 		// Start button = take off
 		// Back button  = land
 		// A button     = take picture
+	    // B button     = toggle video recording
+	    // X button     = toggle marker detection mode
+	    // Y button     = stop, go into hover
 		// Dpad.up      = flip forward
 		//
 		// right joystick Y axis = forward/backward
@@ -138,18 +138,16 @@ public class FindFace
 		    		// Call FaceDetection class to see if faces are present in the current
 		    		// video stream image.
 	    			found = faceDetector.detectFaces();
-	    			
-	    			int faceCount = 0;
+
+	    			// Clear any previous target rectangles.
+	    			camera.addTarget(null);
 	    			
 	    			if (found)
 	    			{
-	    				// Clear any previous target rectangles.
-		    			camera.addTarget(null);
-		    			
 		    			// How many faces are detected? This is just information.
 	    				faceCount = faceDetector.getFaceCount();
 	
-	    				logger.info("face count=" + faceCount);
+	    				logger.finer("face count=" + faceCount);
 	    				
 	    				// Get the array of rectangles describing the location and size
 	    				// of the detected faces.

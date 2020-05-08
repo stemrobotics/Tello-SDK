@@ -472,6 +472,17 @@ public class TelloControl implements TelloControlInterface
 	    			    }
 	    			}
     			    
+	    			// If we are flying and height goes to zero and status is still coming
+	    			// it probably means drone has crashed. So we fake loss of connection to
+	    			// end the program assuming it is monitoring the drone connection status
+	    			// at a higher level.
+	    			if (drone.isFlying() && drone.getHeight() <= 0) 
+	    			{
+	    				logger.severe("crash detected");
+	    				drone.setConnection(TelloConnection.DISCONNECTED);
+	    				break;
+	    			}
+	    			
     			    drone.setAttitude(attpry);
     			    
     			    drone.setAcceleration(accelxyz);
@@ -490,6 +501,8 @@ public class TelloControl implements TelloControlInterface
 	    		drone.setConnection(TelloConnection.DISCONNECTED);
 	    	}
 	    	finally {}
+    		
+    		logger.fine("status monitor thread ended");
 	    	
 	    	statusMonitorThread =  null;
 	    }
@@ -554,6 +567,8 @@ public class TelloControl implements TelloControlInterface
 	    		// Error on status monitor most likely means drone has shut down.
 	    		drone.setConnection(TelloConnection.DISCONNECTED);	    		
 	    	}
+    		
+    		logger.fine("keep alive thread ended");
 	    	
 	    	keepAliveThread =  null;
 	    }

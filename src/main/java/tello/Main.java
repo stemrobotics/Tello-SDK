@@ -43,6 +43,8 @@ public class Main
 //	    FindMissionPad2 demo = new FindMissionPad2();
 	
 	    FindFace demo = new FindFace();
+	
+//	    FindMarker demo = new FindMarker();
 	    
 	    // Run that program.
 	    demo.execute();

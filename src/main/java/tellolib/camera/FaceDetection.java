@@ -27,14 +27,14 @@ public class FaceDetection implements FaceDetectionInterface
 		String basePath = System.getProperty("user.dir");
 		String classifierPath = basePath + "\\src\\resources\\haarcascade_frontalface_alt.xml";
 		
-		logger.fine("classifier path=" + classifierPath);
+		logger.finer("classifier path=" + classifierPath);
 		
 		// Load classifier for faces viewed from the front.
 		faceCascade.load(classifierPath);
 		
 		classifierPath = basePath + "\\src\\resources\\haarcascade_profileface.xml";
 		
-		logger.fine("classifier path=" + classifierPath);
+		logger.finer("classifier path=" + classifierPath);
 		
 		// Load classifier for faes viewed from the side.
 		profileCascade.load(classifierPath);

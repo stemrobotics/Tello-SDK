@@ -1,18 +1,22 @@
 package tello;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.opencv.core.Rect;
 
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
+import tellolib.camera.ArucoMarkers;
+import tellolib.camera.FaceDetection;
 import tellolib.camera.TelloCamera;
 import tellolib.command.TelloFlip;
-import tellolib.communication.TelloConnection;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
-public class FlyController
+public class FindMarker
 {
 	private final Logger logger = Logger.getGlobal(); 
 
@@ -20,15 +24,15 @@ public class FlyController
 	private TelloDrone			drone;
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
+	private ArucoMarkers		markerDetector;
 
 	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
+		int		markerCount;
+		boolean	detectMarkers = false, found = false;
 
 		logger.info("start");
-
-	    // Create game pad class from the Jamepad library included in this project.
-	    // The class supports multiple controllers.
 	    
 	    controllers = new ControllerManager();
 		controllers.initSDLGamepad();
@@ -44,7 +48,11 @@ public class FlyController
 	    drone = TelloDrone.getInstance();
 	    
 	    camera = TelloCamera.getInstance();
-
+	    
+	    // Create instance of Aruco Marker Detection support class.
+	    
+	    markerDetector = ArucoMarkers.getInstance();
+	    		
 	    telloControl.setLogLevel(Level.FINE);
 		
 		// Controller mapping:
@@ -52,8 +60,9 @@ public class FlyController
 		// Back button  = land
 		// A button     = take picture
 	    // B button     = toggle video recording
+	    // X button     = toggle marker detection mode
 	    // Y button     = stop, go into hover
-	    // Dpad.up      = flip forward
+		// Dpad.up      = flip forward
 		//
 		// right joystick Y axis = forward/backward
 		// right joystick X axis = left/right
@@ -66,7 +75,7 @@ public class FlyController
 		    telloControl.connect();
 		    
 		    telloControl.enterCommandMode();
-		    
+		   
 		    telloControl.startStatusMonitor();
 		    
 		    telloControl.streamOn();
@@ -77,7 +86,7 @@ public class FlyController
 		   
 		    // Now we loop until land button is pressed or we lose connection.
 		    
-		    while(telloControl.getConnection() == TelloConnection.CONNECTED) 
+		    while(drone.isConnected()) 
 		    {
 		    	// Read the current state of the first (and in our case only)
 		    	// game pad.
@@ -121,7 +130,42 @@ public class FlyController
 		    			camera.startRecording(System.getProperty("user.dir") + "\\Photos");
 		    	}
 
-		    	// If flying, pass the controller joystick deflection to the drone via
+		    	// X button toggles marker detection. Note when detectMarkers is true we
+		    	// execute the code on each loop, when false we skip code unless X button
+		    	// is pressed.
+		    	
+		    	if (currState.xJustPressed || detectMarkers)
+		    	{
+		    		// Toggle detectMarkers on X button.
+		    		if (currState.xJustPressed) detectMarkers = !detectMarkers;
+		    		
+		    		// Call markerDetection class to see if markers are present in the current
+		    		// video stream image.
+	    			found = markerDetector.detectMarkers();
+
+	    			// Clear any previous target rectangles.
+	    			camera.addTarget(null);
+    			
+	    			if (found)
+	    			{
+		    			// How many markers are detected? This is just information.
+	    				markerCount = markerDetector.getMarkerCount();
+	
+	    				logger.finer("marker count=" + markerCount);
+	    				
+	    				// Get the array of rectangles describing the location and size
+	    				// of the detected faces.
+	    				ArrayList<Rect> markers = markerDetector.getMarkerTargets();
+	    				
+	    				// Set first face rectangle to be drawn on video feed.
+	    				camera.addTarget(markers.get(0));
+	    			}
+	    			
+	    			// Clear any target rectangles if face detection is off.
+	    			if  (!detectMarkers) camera.addTarget(null);
+		    	}
+		    	
+    			// If flying, pass the controller joystick deflection to the drone via
 		    	// the flyRC command.
 		    	
 		    	if (drone.isFlying())
@@ -154,7 +198,7 @@ public class FlyController
 	    	e.printStackTrace();
 	    } finally 
 	    {
-	    	if (telloControl.getConnection() == TelloConnection.CONNECTED && drone.isFlying())
+	    	if (drone.isConnected() && drone.isFlying())
 	    	{
 	    		try
 	    		{telloControl.land();}
@@ -186,4 +230,3 @@ public class FlyController
     			drone.getHeading(), drone.isFlying());
 	}
 }
-

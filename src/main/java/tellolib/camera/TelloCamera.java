@@ -132,6 +132,7 @@ public class TelloCamera implements TelloCameraInterface
 				videoCaptureThread.interrupt();
 				// Wait at most 2 sec for thread to stop.
 				videoCaptureThread.join(2000);
+				logger.fine("after join");
 			} catch (Exception e) {e.printStackTrace();}
 		}
 		
@@ -215,8 +216,6 @@ public class TelloCamera implements TelloCameraInterface
 	    			// Write image to recording file if recording.
 	    			if (recording) videoWriter.write(image);
 	    		}
-	    		
-	    		logger.fine("Video capture thread ended");
 	    	}
 	    	catch (Exception e) 
 	    	{ 
@@ -224,7 +223,9 @@ public class TelloCamera implements TelloCameraInterface
 	    		// Error on status monitor most likely means drone has shut down.
 	    		TelloDrone.getInstance().setConnection(TelloConnection.DISCONNECTED);	    	}
 	    	finally {}
-	    	
+    		
+    		logger.fine("Video capture thread ended");
+
 	    	videoCaptureThread = null;
 	    }
 	}
