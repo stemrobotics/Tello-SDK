@@ -23,12 +23,13 @@ public class FindFace
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
 	private FaceDetection		faceDetector;
-
+	private boolean				detectFaces = false;
+	
 	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
 		int		faceCount;
-		boolean	detectFaces = false, found = false;
+		boolean	found = false;
 
 		logger.info("start");
 	    
@@ -222,7 +223,7 @@ public class FindFace
 	
 	private String updateWindow()
 	{
-    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b", drone.getBattery(), drone.getHeight(), 
-    			drone.getHeading(), drone.isFlying());
+    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b  Detect: %b", drone.getBattery(), drone.getHeight(), 
+    			drone.getHeading(), drone.isFlying(), detectFaces);
 	}
 }

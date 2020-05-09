@@ -10,7 +10,6 @@ import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
 import tellolib.camera.ArucoMarkers;
-import tellolib.camera.FaceDetection;
 import tellolib.camera.TelloCamera;
 import tellolib.command.TelloFlip;
 import tellolib.control.TelloControl;
@@ -25,12 +24,13 @@ public class FindMarker
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
 	private ArucoMarkers		markerDetector;
-
+	private boolean				detectMarkers = false;
+	
 	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
 		int		markerCount;
-		boolean	detectMarkers = false, found = false;
+		boolean found = false;
 
 		logger.info("start");
 	    
@@ -226,7 +226,7 @@ public class FindMarker
 	
 	private String updateWindow()
 	{
-    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b", drone.getBattery(), drone.getHeight(), 
-    			drone.getHeading(), drone.isFlying());
+    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b  Detect: %b", drone.getBattery(), drone.getHeight(), 
+    			drone.getHeading(), drone.isFlying(), detectMarkers);
 	}
 }

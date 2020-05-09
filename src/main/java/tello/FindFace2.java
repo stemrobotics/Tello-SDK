@@ -23,12 +23,12 @@ public class FindFace2
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
 	private FaceDetection		faceDetector;
-
+	private boolean				detectFaces = false;
+	
 	public void execute() throws Exception
 	{
 		int		leftX, leftY, rightX, rightY, deadZone = 10;
 		Thread	checkForFacesThread = null;
-		boolean	detectFaces = false, found = false;
 
 		logger.info("start");
 	    
@@ -146,7 +146,7 @@ public class FindFace2
 	    				checkForFacesThread.interrupt();
 	    			
 	    			// Clear any target rectangles if face detection is off.
-	    			if  (!detectFaces) camera.addTarget(null);
+	    			//if  (!detectFaces) camera.addTarget(null);
 		    	}
 		    	
     			// If flying, pass the controller joystick deflection to the drone via
@@ -210,8 +210,8 @@ public class FindFace2
 	
 	private String updateWindow()
 	{
-    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b", drone.getBattery(), drone.getHeight(), 
-    			drone.getHeading(), drone.isFlying());
+    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b  Detect: %b", drone.getBattery(), drone.getHeight(), 
+    			drone.getHeading(), drone.isFlying(), detectFaces);
 	}
 
 	// Class with a class, called a nested or inner class. It has the features of
@@ -224,30 +224,40 @@ public class FindFace2
 			boolean	found;
 			int		faceCount;
 			
-			while (!isInterrupted())
+			try
 			{
-				// Call FaceDetection class to see if faces are present in the current
-				// video stream image.
-				found = faceDetector.detectFaces();
-		
-				// Clear any previous target rectangles.
-				camera.addTarget(null);
-				
-				if (found)
+				while (!isInterrupted())
 				{
-					// How many faces are detected? This is just information.
-					faceCount = faceDetector.getFaceCount();
-		
-					logger.finer("face count=" + faceCount);
+					// Call FaceDetection class to see if faces are present in the current
+					// video stream image.
+					found = faceDetector.detectFaces();
+			
+					// Clear any previous target rectangles.
+					camera.addTarget(null);
 					
-					// Get the array of rectangles describing the location and size
-					// of the detected faces.
-					Rect[] faces = faceDetector.getFaces();
-					
-					// Set first face rectangle to be drawn on video feed.
-					camera.addTarget(faces[0]);
+					if (found)
+					{
+						// How many faces are detected? This is just information.
+						faceCount = faceDetector.getFaceCount();
+			
+						logger.finer("face count=" + faceCount);
+						
+						// Get the array of rectangles describing the location and size
+						// of the detected faces.
+						Rect[] faces = faceDetector.getFaces();
+						
+						// Set first face rectangle to be drawn on video feed.
+						camera.addTarget(faces[0]);
+					}
+			    	
+			    	Thread.sleep(200);
 				}
-			}
+			} 
+	    	catch (InterruptedException e) {}
+	    	catch (Exception e) {e.printStackTrace();}
+			
+			// Clear any target rectangles if face detection is off.
+			camera.addTarget(null);
 		}
 	}
 }
