@@ -25,6 +25,7 @@ public class FindMarker
 	private ControllerManager	controllers;
 	private ArucoMarkers		markerDetector;
 	private boolean				detectMarkers = false;
+	private int					markerId = 0;
 	
 	public void execute() throws Exception
 	{
@@ -154,12 +155,14 @@ public class FindMarker
 	    				logger.finer("marker count=" + markerCount);
 	    				
 	    				// Get the array of rectangles describing the location and size
-	    				// of the detected faces.
+	    				// of the detected markers.
 	    				ArrayList<Rect> markers = markerDetector.getMarkerTargets();
 	    				
-	    				// Set first face rectangle to be drawn on video feed.
+	    				// Set first marker rectangle to be drawn on video feed.
 	    				camera.addTarget(markers.get(0));
-	    			}
+	    				
+	    				markerId = markerDetector.getMarkerId(0);
+	    			} else markerId = 0;
 	    			
 	    			// Clear any target rectangles if face detection is off.
 	    			if  (!detectMarkers) camera.addTarget(null);
@@ -226,7 +229,7 @@ public class FindMarker
 	
 	private String updateWindow()
 	{
-    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b  Detect: %b", drone.getBattery(), drone.getHeight(), 
-    			drone.getHeading(), drone.isFlying(), detectMarkers);
+    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b  Detect: %b  Id: %d", drone.getBattery(), drone.getHeight(), 
+    			drone.getHeading(), drone.isFlying(), detectMarkers, markerId);
 	}
 }

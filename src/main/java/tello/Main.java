@@ -41,12 +41,12 @@ public class Main
 //	    FlyController demo = new FlyController();
 
 //	    FindMissionPad2 demo = new FindMissionPad2();
+		
+	    FindMarker demo = new FindMarker();
 	
-	    FindFace demo = new FindFace();
+//	    FindFace demo = new FindFace();
 
 //	    FindFace2 demo = new FindFace2();
-	
-//	    FindMarker demo = new FindMarker();
 	    
 	    // Run that program.
 	    demo.execute();

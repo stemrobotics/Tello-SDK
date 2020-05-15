@@ -60,13 +60,18 @@ public class ArucoMarkers implements ArucoMarkersInterface
 		ids = new Mat();
 		corners = new Vector<Mat>();
 		
+		// Convert color image to grayscale (back & white).
 		Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
+		
+		// Use OpenCV Aruco class to perform marker detection. Returns array
+		// of detected maker id numbers and an array of information (matrix)
+		// describing the corner locations of each marker.
 		
 		Aruco.detectMarkers(grayFrame, dict, corners, ids);
 		
 		if (ids.empty()) return false;
 		
-		logger.fine("ids=" + ids.dump());
+		logger.finer("ids=" + ids.dump());
 		
 		return true;
 	}
@@ -96,6 +101,8 @@ public class ArucoMarkers implements ArucoMarkersInterface
 		
 		ArrayList<MatOfPoint> 	contours = new ArrayList<MatOfPoint>();
 		ArrayList<Point>		points;
+		
+		// Convert each marker corner matrix into a contour bounding the marker image.
 		
 		for (int i = 0; i < getMarkerCount(); i++)
 		{
@@ -136,11 +143,15 @@ public class ArucoMarkers implements ArucoMarkersInterface
 		
 		if  (ids == null) return null;
 		
+		// Convert each corner into a rectangle. This works best when marker image is
+		// displayed in landscape orientation and aligned with the drone camera. This is
+		// a limitation of the conversion algorithm below.
+		
 		for (int i = 0; i < getMarkerCount(); i++)
 		{
 			Mat mat = corners.get(i);
 
-			//logger.fine("corners(" + i + ")=" + mat.dump());
+			//logger.finer("corners(" + i + ")=" + mat.dump());
 
 			// The marker corner mat (matrix) contains an array of the locations
 			// of the 4 corners of the detected marker starting with the upper
@@ -171,7 +182,7 @@ public class ArucoMarkers implements ArucoMarkersInterface
 			
 			targetRectangles.add(rect);
 			
-			logger.fine("rect=" + rect.toString());
+			logger.finer("rect=" + rect.toString());
 		}
 		
 		return targetRectangles;

@@ -52,7 +52,7 @@ public interface ArucoMarkersInterface
 	/**
 	 * Get the contours of detected markers as an array points for each
 	 * marker from the last call to detectMarkers().
-	 * @return Array of vector of 4 corner points for each marker. Null if
+	 * @return Array of vectors of 4 corner points for each marker. Null if
 	 * no markers found.
 	 */
 	public ArrayList<MatOfPoint> getMarkerContours();

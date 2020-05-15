@@ -128,9 +128,11 @@ public class TelloControl implements TelloControlInterface
 	@Override
 	public void land() 
 	{
+		// We do this first so the crash detection code in status monitor will not think
+		// we have crashed when height goes to zero.
+	  	drone.setFlying(false);
 		TelloCommandInterface command = new BasicTelloCommand(TelloCommandValues.LAND);
 	  	communication.executeCommand(command);
-	  	drone.setFlying(false);
 	}
 	
 	@Override

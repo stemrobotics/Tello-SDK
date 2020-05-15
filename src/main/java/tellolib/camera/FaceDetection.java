@@ -36,7 +36,7 @@ public class FaceDetection implements FaceDetectionInterface
 		
 		logger.finer("classifier path=" + classifierPath);
 		
-		// Load classifier for faes viewed from the side.
+		// Load classifier for faces viewed from the side.
 		profileCascade.load(classifierPath);
 
 	}
