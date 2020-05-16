@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
@@ -15,7 +16,7 @@ import tellolib.command.TelloFlip;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
-public class FindMarker
+public class TrackMarker
 {
 	private final Logger logger = Logger.getGlobal(); 
 
@@ -24,14 +25,15 @@ public class FindMarker
 	private TelloCamera			camera;
 	private ControllerManager	controllers;
 	private ArucoMarkers		markerDetector;
-	private boolean				detectMarkers = false;
-	private int					markerId = 0;
+	private boolean				trackMarker = false;
+	private int					markerId = 0, initialTargetArea = 0;
 	
 	public void execute() throws Exception
 	{
-		int		leftX, leftY, rightX, rightY, deadZone = 10;
-		int		markerCount;
-		boolean found = false;
+		int				leftX, leftY, rightX, rightY, deadZone = 10;
+		int				markerCount;
+		boolean 		found = false;
+		TrackingResult	trackingResult = null;
 
 		logger.info("start");
 	    
@@ -131,14 +133,14 @@ public class FindMarker
 		    			camera.startRecording(System.getProperty("user.dir") + "\\Photos");
 		    	}
 
-		    	// X button toggles marker detection. Note when detectMarkers is true we
+		    	// X button toggles marker detection and tracking. Note when detectMarkers is true we
 		    	// execute the code on each loop, when false we skip code unless X button
 		    	// is pressed.
 		    	
-		    	if (currState.xJustPressed || detectMarkers)
+		    	if (currState.xJustPressed || trackMarker)
 		    	{
-		    		// Toggle detectMarkers on X button.
-		    		if (currState.xJustPressed) detectMarkers = !detectMarkers;
+		    		// Toggle detectMarker on X button.
+		    		if (currState.xJustPressed) trackMarker = !trackMarker;
 		    		
 		    		// Call markerDetection class to see if markers are present in the current
 		    		// video stream image.
@@ -158,20 +160,29 @@ public class FindMarker
 	    				// of the detected markers.
 	    				ArrayList<Rect> markers = markerDetector.getMarkerTargets();
 	    				
-	    				// Set first marker rectangle to be drawn on video feed.
-	    				camera.addTarget(markers.get(0));
-	    				
+	    				// Get marker id of first marker.
 	    				markerId = markerDetector.getMarkerId(0);
-	    			} else markerId = 0;
+	    				
+	    				// Track the first marker computing flyRC input to center marker
+	    				// in camera view and adjust distance to marker based on marker
+	    				// size in the camera view.
+	    				
+	    				trackingResult = followTarget(markers.get(0));
+	    			} else 
+	    			{
+	    				markerId = 0;
+	    				// Set drone to rotate slowly to acquire marker.
+	    				trackingResult = new TrackingResult(2, 0);
+	    			}
 	    			
 	    			// Clear any target rectangles if marker detection was turned off.
-	    			if  (!detectMarkers) camera.addTarget(null);
+	    			if  (!trackMarker) camera.addTarget(null);
 		    	}
 		    	
     			// If flying, pass the controller joystick deflection to the drone via
-		    	// the flyRC command.
+		    	// the flyRC command. Bypass if we are in marker tracking mode.
 		    	
-		    	if (drone.isFlying())
+		    	if (drone.isFlying() && !trackMarker)
 		    	{
 		    		// scale controller stick axis range -1.0 to + 1.0 to -100 to + 100
 		    		// used by the drone flyRC command. Apply a dead zone to allow
@@ -192,6 +203,14 @@ public class FindMarker
 		    		if (currState.dpadUpJustPressed) telloControl.doFlip(TelloFlip.forward);
 		    		
 		    		if (currState.yJustPressed) telloControl.stop();
+		    	} 
+		    	
+		    	// If flying and we are marker tracking, fly drone according to tracking result.
+		    	
+		    	if (drone.isFlying() && trackMarker)
+		    	{
+		    		//                 L/R        F/B                U/D            YAW
+	    			telloControl.flyRC(0, trackingResult.forwardBack, 0, trackingResult.leftRight);
 		    	}
 		    	
 		    	Thread.sleep(100);
@@ -229,7 +248,96 @@ public class FindMarker
 	
 	private String updateWindow()
 	{
-    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b  Detect: %b  Id: %d", drone.getBattery(), drone.getHeight(), 
-    			drone.getHeading(), drone.isFlying(), detectMarkers, markerId);
+    	 return String.format("Batt: %d  Alt: %d  Hdg: %d  Rdy: %b  Track: %b  Id: %d", drone.getBattery(), drone.getHeight(), 
+    			drone.getHeading(), drone.isFlying(), trackMarker, markerId);
+	}
+	
+	private class TrackingResult
+	{
+		public int	leftRight, forwardBack;
+		
+		public TrackingResult(int leftRight, int forwardBack)
+		{
+			this.leftRight = leftRight;
+			this.forwardBack = forwardBack;
+		}
+	}
+	
+	private TrackingResult followTarget(Rect target)
+	{
+		// Outline the target being tracked.
+		camera.addTarget(target);
+		
+		Size imageSize = camera.getImageSize();
+		
+		// get size of target area.
+		int targetArea = target.height * target.width;
+		
+		// If we have just aquired target, record initial size. Size comparison
+		// is how we determine distance to target.
+		
+		if (initialTargetArea == 0) initialTargetArea = targetArea;
+		
+		// Compute center point of target in the camera view image.
+		int targetCenterX = target.x + target.width / 2;
+		int imageCenterX = (int) (imageSize.width / 2);
+		
+		// offset minus indicates target is left of image center,
+		// plus to the right. If target is left, drone needs to turn
+		// left to center the target in the image.
+		
+		int offset = targetCenterX - imageCenterX;
+
+		logger.finer("offset=" + offset);
+		
+		// If offset is small, call it good otherwise the drone
+		// hunts back and forth. All of the constants determine
+		// experimentally.
+		
+		//if (Math.abs(offset) < 20) offset = 0;
+		
+		// "speed" of rotation in degrees. Need to rotate faster
+		// if offset is larger to better track target movement.
+		// 5 degrees is minimum.
+		
+//		int rotate = 5;
+//		
+//		if (offset / 50 != 0) rotate = rotate * Math.abs(offset) / 50;
+//		
+//		if  (offset > 0)
+//			telloControl.rotateRight(rotate);
+//		else if (offset < 0)
+//			telloControl.rotateLeft(rotate);
+		
+		// Determine change in distance from first target acquisition.
+		
+		int distance = initialTargetArea - targetArea;
+		
+		logger.finer(String.format("ia=%d  ta=%d  dist=%d", initialTargetArea, targetArea, distance));
+		
+		// If distance is small, call it good otherwise the drone
+		// hunts back and forth. Value must be determined by testing.
+	
+		if (Math.abs(distance) < 5000) distance = 0;
+		
+		// scale distance to a value compatible with flyRC command.
+		
+		distance = (int) (distance * 1.0);
+	
+//		// Centimeters to move to adjust distance to target. 20 cm
+//		// is the default and minimum. Need to move more if target is far away
+//		// less if up close. Not yet done.
+//		
+//		int forwardBack = 20;
+//		
+//		// Plus distance means the target has moved away, minus means
+//		// moved closer.
+//		
+//		if (distance > 0)
+//			telloControl.forward(forwardBack);
+//		else if (distance < 0)
+//			telloControl.backward(forwardBack);
+		
+		return new TrackingResult(offset, distance);
 	}
 }
