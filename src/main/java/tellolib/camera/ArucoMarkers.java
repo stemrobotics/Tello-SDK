@@ -55,16 +55,22 @@ public class ArucoMarkers implements ArucoMarkersInterface
 	{
 		if (frame == null) return false;
 		
+		// Create empty Mat to receive the grayscale input Mat (image).
+		
 		Mat	grayFrame = new Mat();
 
+		// Get new empty Mat to receive the list of marker Ids.
 		ids = new Mat();
+		
+		// Create new empty vector (array) of marker corner sets which are each
+		// a Mat (array) of 4 entries describing the 4 corners of a marker.
 		corners = new Vector<Mat>();
 		
 		// Convert color image to grayscale (back & white).
 		Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
 		
 		// Use OpenCV Aruco class to perform marker detection. Returns array
-		// of detected maker id numbers and an array of information (matrix)
+		// of detected maker id numbers and an array of information (matrices)
 		// describing the corner locations of each marker.
 		
 		Aruco.detectMarkers(grayFrame, dict, corners, ids);
@@ -143,42 +149,36 @@ public class ArucoMarkers implements ArucoMarkersInterface
 		
 		if  (ids == null) return null;
 		
-		// Convert each corner into a rectangle. This works best when marker image is
-		// displayed in landscape orientation and aligned with the drone camera. This is
-		// a limitation of the conversion algorithm below.
+		// Convert each corner set into a rectangle. This works best when marker image is
+		// displayed in level orientation and aligned with the drone camera.
 		
 		for (int i = 0; i < getMarkerCount(); i++)
 		{
+			// Get the Mat (2d array/matrix) of the marker we are processing. This Mat is
+			// an array describing the 4 corners of the marker in the processed image.
 			Mat mat = corners.get(i);
 
 			//logger.finer("corners(" + i + ")=" + mat.dump());
 
-			// The marker corner mat (matrix) contains an array of the locations
+			// The marker corner Mat (matrix) contains an array of the locations
 			// of the 4 corners of the detected marker starting with the upper
 			// left corner, upper right, lower right, lower left. For each corner
-			// the location is given as x,y. This quite different than the Rect
+			// the location is given as x,y. This quite different than the OpenCV Rect
 			// class description of a rectangle: upper left corner as x,y and
-			// height and width. So we convert.
+			// height and width. So we convert to rectangle using the upper left and
+			// lower right corners as the two point that define a rectangle.
 			
-			//logger.fine("x0=" + mat.get(0, 0)[0] + " y0=" + mat.get(0, 0)[1]);
-			//logger.fine("x1=" + mat.get(0, 1)[0] + " y1=" + mat.get(0, 1)[1]);
-			//logger.fine("x2=" + mat.get(0, 2)[0] + " y2=" + mat.get(0, 2)[1]);
-			//logger.fine("x3=" + mat.get(0, 3)[0] + " y3=" + mat.get(0, 3)[1]);
 			
-			int x0 = (int) mat.get(0, 0)[0];
-			int y0 = (int) mat.get(0, 0)[1];
-			int x1 = (int) mat.get(0, 1)[0];
-			int y1 = (int) mat.get(0, 1)[1];
-			//int x2 = (int) mat.get(0, 2)[0];
-			//int y2 = (int) mat.get(0, 2)[1];
-			//int x3 = (int) mat.get(0, 3)[0];
-			int y3 = (int) mat.get(0, 3)[1];
+			int x0 = (int) mat.get(0, 0)[0];	// upper left x pos.			
+			int y0 = (int) mat.get(0, 0)[1];	// upper left y pos.
+			//int x1 = (int) mat.get(0, 1)[0];	// upper right x pos.
+			//int y1 = (int) mat.get(0, 1)[1];	// upper right y pos.
+			int x2 = (int) mat.get(0, 2)[0];	// lower right x pos.
+			int y2 = (int) mat.get(0, 2)[1];	// lower right y pos.
+			//int x3 = (int) mat.get(0, 3)[0];	// lower left x pos.
+			//int y3 = (int) mat.get(0, 3)[1];	// lower left y pos.
 
-			Rect rect = new Rect();
-			rect.x = x0;
-			rect.y = y0;
-			rect.width = x1 - x0;
-			rect.height = y3 - y0;
+			Rect rect = new Rect(new Point(x0, y0), new  Point(x2, y2));
 			
 			targetRectangles.add(rect);
 			

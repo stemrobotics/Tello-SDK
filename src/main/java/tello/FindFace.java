@@ -130,18 +130,20 @@ public class FindFace
 		    	}
 
 		    	// X button toggles face detection.
-		    	
-		    	if (currState.xJustPressed || detectFaces)
+
+		    	if (currState.xJustPressed)
 		    	{
-		    		// Toggle detectFaces on X button.
-		    		if (currState.xJustPressed) detectFaces = !detectFaces;
-		    		
+		    		detectFaces = !detectFaces;
+	    			
+	    			// Clear any target rectangles if face detection is off.
+	    			if  (!detectFaces) camera.addTarget(null);
+		    	}
+		    	
+		    	if (detectFaces)
+		    	{
 		    		// Call FaceDetection class to see if faces are present in the current
 		    		// video stream image.
 	    			found = faceDetector.detectFaces();
-
-	    			// Clear any previous target rectangles.
-	    			camera.addTarget(null);
 	    			
 	    			if (found)
 	    			{
@@ -153,13 +155,13 @@ public class FindFace
 	    				// Get the array of rectangles describing the location and size
 	    				// of the detected faces.
 	    				Rect[] faces = faceDetector.getFaces();
+
+		    			// Clear any previous target rectangles.
+		    			camera.addTarget(null);
 	    				
 	    				// Set first face rectangle to be drawn on video feed.
 	    				camera.addTarget(faces[0]);
 	    			}
-	    			
-	    			// Clear any target rectangles if face detection is off.
-	    			if  (!detectFaces) camera.addTarget(null);
 		    	}
 		    	
     			// If flying, pass the controller joystick deflection to the drone via

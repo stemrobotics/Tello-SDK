@@ -135,17 +135,20 @@ public class FindMarker
 		    	// execute the code on each loop, when false we skip code unless X button
 		    	// is pressed.
 		    	
-		    	if (currState.xJustPressed || detectMarkers)
+		    	if (currState.xJustPressed)
 		    	{
 		    		// Toggle detectMarkers on X button.
-		    		if (currState.xJustPressed) detectMarkers = !detectMarkers;
-		    		
+		    		detectMarkers = !detectMarkers;
+	    			
+	    			// Clear any target rectangles if marker detection was turned off.
+	    			if  (!detectMarkers) camera.addTarget(null);
+		    	}
+		    	
+		    	if (detectMarkers)
+		    	{
 		    		// Call markerDetection class to see if markers are present in the current
 		    		// video stream image.
 	    			found = markerDetector.detectMarkers();
-
-	    			// Clear any previous target rectangles.
-	    			camera.addTarget(null);
     			
 	    			if (found)
 	    			{
@@ -157,15 +160,18 @@ public class FindMarker
 	    				// Get the array of rectangles describing the location and size
 	    				// of the detected markers.
 	    				ArrayList<Rect> markers = markerDetector.getMarkerTargets();
+
+			    		// Clear any previous target rectangles on camera feed.
+		    			camera.addTarget(null);
 	    				
 	    				// Set first marker rectangle to be drawn on video feed.
 	    				camera.addTarget(markers.get(0));
 	    				
 	    				markerId = markerDetector.getMarkerId(0);
-	    			} else markerId = 0;
-	    			
-	    			// Clear any target rectangles if marker detection was turned off.
-	    			if  (!detectMarkers) camera.addTarget(null);
+	    			} else {
+		    			camera.addTarget(null);
+	    				markerId = 0;
+	    			}
 		    	}
 		    	
     			// If flying, pass the controller joystick deflection to the drone via

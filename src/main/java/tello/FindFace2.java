@@ -137,6 +137,7 @@ public class FindFace2
 		    		
 		    		// If true, we start thread to watch for faces else we would
 		    		// already have thread running to we signal it to stop.
+		    		
 	    			if (detectFaces)
 	    			{
 	    				checkForFacesThread = new CheckForFaces();
@@ -144,9 +145,6 @@ public class FindFace2
 	    			}
 	    			else 
 	    				checkForFacesThread.interrupt();
-	    			
-	    			// Clear any target rectangles if face detection is off.
-	    			//if  (!detectFaces) camera.addTarget(null);
 		    	}
 		    	
     			// If flying, pass the controller joystick deflection to the drone via

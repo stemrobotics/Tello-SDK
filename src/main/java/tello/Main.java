@@ -42,11 +42,13 @@ public class Main
 
 //	    FindMissionPad2 demo = new FindMissionPad2();
 		
-	    FindMarker demo = new FindMarker();
+//	    FindMarker demo = new FindMarker();
 	
 //	    FindFace demo = new FindFace();
 
 //	    FindFace2 demo = new FindFace2();
+	
+	    TrackMarker demo = new TrackMarker();
 	    
 	    // Run that program.
 	    demo.execute();
