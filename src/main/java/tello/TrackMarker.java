@@ -58,7 +58,7 @@ public class TrackMarker
 	    markerDetector = ArucoMarkers.getInstance();
 	    		
 	    telloControl.setLogLevel(Level.FINE);
-		
+	    
 		// Controller mapping:
 		// Start button = take off
 		// Back button  = land
@@ -141,7 +141,7 @@ public class TrackMarker
 		    		// Toggle trackMarker on X button.
 		    		trackMarker = !trackMarker;
 	    			
-	    			// Clear any target rectangles if marker detection was turned off.
+	    			// Clear any target rectangles if marker detection is turned off.
 	    			if  (!trackMarker) 
 	    			{
 	    				camera.addTarget(null);
@@ -158,10 +158,10 @@ public class TrackMarker
 	    			if (found)
 	    			{
 	    				if (lastDetectionTime != 0) 
-	    					{
+	    				{
 	    					long elapsedTime = System.currentTimeMillis() - lastDetectionTime;
-	    					logger.info("time: " + elapsedTime);
-	    					}
+	    					logger.fine("time: " + elapsedTime);
+	    				}
 	    				
 	    				// record time of detection.
 	    				lastDetectionTime = System.currentTimeMillis();
@@ -180,13 +180,14 @@ public class TrackMarker
 	    				
 	    				// Track the first marker by computing flyRC input to center marker
 	    				// in camera view and adjust distance to marker based on marker
-	    				// size in the camera view.
+	    				// size in the camera view. We also allow a momentary loss of marker
+	    				// before switching back to search mode.
 	    				
 	    				trackingResult = followTarget(markers.get(0));
 	    			} else if (System.currentTimeMillis() - lastDetectionTime < 1000) {
 	    				trackingResult = new TrackingResult(0, 0);
 	    			} else {
-	    				logger.info("no marker");
+	    				logger.fine("no marker");
 		    			camera.addTarget(null);
 	    				markerId = 0;
 	    				initialTargetArea = 0;
@@ -313,7 +314,7 @@ public class TrackMarker
 		
 		int offset = targetCenterX - imageCenterX;
 
-		logger.info("offset=" + offset);
+		logger.fine("offset=" + offset);
 		
 		offset *= .25;	// Scale offset down;
 		
@@ -321,28 +322,30 @@ public class TrackMarker
 		
 		double distance = initialTargetArea - targetArea;
 		
-		logger.info(String.format("ia=%d  ta=%d  dist=%.0f", initialTargetArea, targetArea, distance));
+		logger.fine(String.format("ia=%d  ta=%d  dist=%.0f", initialTargetArea, targetArea, distance));
 		
 		//initialTargetArea = targetArea;
+		
+		double scaleFactor = 0.0;
 		
 		// If distance is small, call it good otherwise the drone
 		// hunts back and forth. Value must be determined by testing.
 		
-		double scaleFactor = 0.0;
-		
-		if (Math.abs(distance) < 1000.0) 
+		if (Math.abs(distance) < 2000.0) 
 			distance = 0.0;
 		else
 		{
-			// scale distance change to a fwd/back movement value of 15 for flyRC command.
+			// Scale distance change to a fwd/back movement value of 20% for flyRC command.
+			// For some unknown reason, need more power to fly forward than back and even
+			// with 30%, forward seems not reliable.
 			// scaleFactor must be positive to preserve the sign of distance value.
 			
-			scaleFactor = 15.0 / Math.abs(distance);
+			scaleFactor = 20.0 / Math.abs(distance);
 		
 			distance = distance * scaleFactor;
 		}
 		
-		logger.info(String.format("dist=%.1f  fact=%f",  distance, scaleFactor));
+		logger.fine(String.format("dist=%.1f  fact=%f",  distance, scaleFactor));
 		
 		return new TrackingResult(offset, (int) distance);
 	}

@@ -8,6 +8,8 @@ import tellolib.control.TelloControl;
 
 public class Demo1
 {
+	// Get an reference to the Java Global Logger that was configured and level
+	// set by the Main class.
 	private final Logger logger = Logger.getGlobal(); 
 
 	public void execute()
@@ -19,6 +21,10 @@ public class Demo1
 		
 	    TelloControl telloControl = TelloControl.getInstance();
 	    
+	    // TelloControl class has a separate logger so it can log at
+	    // a different level than the code that calls it. TelloControl
+	    // logging is off by default. The rest of the Tello SDK classes use
+	    // this separate logger as well.
 	    // Set log level to FINE to see information from the SDK classes 
 	    // about what they are doing. Helps to understand how they work
 	    // and helpful for debugging.

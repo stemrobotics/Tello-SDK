@@ -22,8 +22,8 @@ import java.util.logging.Logger;
  */
 public class TelloControl implements TelloControlInterface 
 {
-	private final 	Logger logger = Logger.getLogger("Tello");
-	private final 	ConsoleHandler handler = new ConsoleHandler();
+	private final 	Logger			logger = Logger.getLogger("Tello");
+	private final 	ConsoleHandler 	handler = new ConsoleHandler();
 	
 	private TelloDrone			drone;
 	
