@@ -28,6 +28,7 @@ public class Main
 		// handler instances. The logger is used by the calling program to create
 		// log messages and the handler is used by the logger to send log messages
 		// to a destination (like the console or a file).
+		
 	  	logger.setLevel(Level.FINE);
 		handler.setLevel(Level.FINE);
 

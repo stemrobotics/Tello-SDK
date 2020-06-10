@@ -1,11 +1,8 @@
 package tello;
 
-import static java.lang.Thread.sleep;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import tellolib.command.TelloFlip;
 import tellolib.communication.TelloConnection;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;

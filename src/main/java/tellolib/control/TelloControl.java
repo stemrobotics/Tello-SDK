@@ -413,6 +413,9 @@ public class TelloControl implements TelloControlInterface
 	
 	private class StatusMonitor extends Thread
 	{
+		boolean		crashDetected;
+		long		lastDetectionTime = 0;
+		
 		StatusMonitor()
 		{
 			logger.fine("monitor thread constructor");
@@ -475,15 +478,17 @@ public class TelloControl implements TelloControlInterface
 	    			}
     			    
 	    			// If we are flying and height goes to zero and status is still coming
-	    			// it probably means drone has crashed. So we fake loss of connection to
-	    			// end the program assuming it is monitoring the drone connection status
-	    			// at a higher level.
+	    			// it probably means drone has crashed. This condition must persist 
+	    			// for more than 1 second to avoid spurious height = 0 reports.
+	    			
 	    			if (drone.isFlying() && drone.getHeight() <= 0) 
 	    			{
-	    				logger.severe("crash detected");
-	    				drone.setConnection(TelloConnection.DISCONNECTED);
-	    				break;
-	    			}
+	    				lastDetectionTime = System.currentTimeMillis();
+	    				crashDetected = true;
+	    			} else crashDetected = false;
+	    			
+	    			if (crashDetected && System.currentTimeMillis() - lastDetectionTime > 1000)
+	    				throw new Exception("crash detected");
 	    			
     			    drone.setAttitude(attpry);
     			    
