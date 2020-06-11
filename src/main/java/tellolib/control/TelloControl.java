@@ -609,4 +609,13 @@ public class TelloControl implements TelloControlInterface
 		TelloCommandInterface command = new ComplexTelloCommand(TelloCommandValues.STATION_MODE, ssid + " " + password);
 		communication.executeCommand(command);
 	}
+
+	@Override
+	public void curve( Integer x1, Integer y1, Integer z1, Integer x2, Integer y2, Integer z2, Integer speed )
+	{
+		TelloCommandInterface command = new ComplexTelloCommand(TelloCommandValues.CURVE, 
+				x1.toString() + " " + y1.toString() + " " + z1.toString() + " " + 
+				x2.toString() + " " + y2.toString() + " " + z2.toString() + " " + speed.toString());
+		communication.executeCommand(command);
+	}
 }

@@ -84,7 +84,7 @@ public class TelloCommandValues
 
 
   /**
-   * Fly to x y z at speed (cm/s). go x y z speed.
+   * Fly to x y z offset from current position at speed (cm/s). go x y z speed.
    * x = -500 to +500 y = -500 to +500 z = -500 to +500 speed = 10 to 100. Note: x, y, and z values
    * can't be set between -20 and +20 simultaneously. go x y z speed.
    * 
@@ -105,7 +105,7 @@ public class TelloCommandValues
   public static final String JUMP = "jump";
 
   /**
-   * Fly at a curve according to the two given coordinates at speed (cm/s). 
+   * Fly at a curve from current position according to the two given offset coordinates at speed (cm/s). 
    * curve x1 y1 z1 x2 y2 z2 speed. 
    * If the arc radius is not within a range of 0.5 to 10 meters, it will respond with an error. 
    * x1, x2 = -500 to +500 y1, y2 = -500 to +500 z1, z2 = -500 to +500 speed = 10 to 60. Note: x, y, and z values 
