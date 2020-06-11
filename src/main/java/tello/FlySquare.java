@@ -36,8 +36,6 @@ public class FlySquare
 		    
 		    telloControl.startStatusMonitor();
 		    
-		    telloControl.takeOff();
-		    
 		    telloControl.streamOn();
 		    
 		    // Set the video stream processor to automatically update the video
@@ -46,6 +44,8 @@ public class FlySquare
 		    camera.setStatusBar(this::updateWindow);
 		    
 		    camera.startVideoCapture(true);
+		    
+		    telloControl.takeOff();
 		    
 		    // Now we will execute a series of movement commands to fly in a square
 		    // pattern. Distances in centimeters.

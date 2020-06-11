@@ -127,15 +127,15 @@ public interface TelloControlInterface
   
   /**
    * Fly to these offsets from current position.
-   * @param x X axis offset (20-500 cm).
-   * @param y Y axis offset (20-500 cm).
-   * @param z Z axis offset (20-500 cm).
-   * @param speed Speed of movement (10-100 cm/s).
+   * @param x X axis offset (-500 to 500 cm).
+   * @param y Y axis offset (-500 to 500 cm).
+   * @param z Z axis offset (-500 to 500 cm).
+   * @param speed Speed of movement (10 to 100 cm/s).
    */
   void goTo(Integer x, Integer y, Integer z, Integer speed);
   
   /**
-   * Fly by remote control.
+   * Fly by remote control. Units are speed in cm/s.
    * @param lr Left/Right (-100 to 100).
    * @param fb forward/backward (-100 to 100).
    * @param ud up/down (-100 to 100).

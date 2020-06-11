@@ -36,13 +36,13 @@ public class FlyGrid
 		    
 		    telloControl.startStatusMonitor();
 		    
-		    telloControl.takeOff();
-		    
 		    telloControl.streamOn();
 		    
 		    camera.setStatusBar(this::updateWindow);
 		    
-		    camera.startVideoCapture(false);
+		    camera.startVideoCapture(true);
+		    
+		    telloControl.takeOff();
 		    
 		    // Now we will execute a series of movement commands to fly in a grid
 		    // pattern. Distances in centimeters.

@@ -38,11 +38,6 @@ public class Demo5
 		    telloControl.enterCommandMode();
 		    
 		    telloControl.startStatusMonitor();
-		    
-		    // Video feed is interrupted during take off so we don't start it
-		    // unit airborne.
-		    
-		    telloControl.takeOff();
 
 		    // Send command to drone to turn on video stream.
 		    
@@ -58,6 +53,10 @@ public class Demo5
 		    // Eclipse project. File will be labeled with date and time.
 		    
 		    camera.startRecording(System.getProperty("user.dir") + "\\Photos");
+
+		    // Tell drone to get airborne.
+		    
+		    telloControl.takeOff();
 
 		    // Now we will execute a series of movement commands.
 		    // Distances in centimeters.

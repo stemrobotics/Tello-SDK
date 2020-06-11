@@ -151,6 +151,12 @@ public class TelloCamera implements TelloCameraInterface
 	@Override
 	public Mat getImage()
 	{
+		// Make a copy of the current image and return to the caller. This allows
+		// the caller to work with the copy while the the internal image in this
+		// class is continues to be updated by the video processing thread. The
+		// synchronized key word prevents the processing thread from changing
+		// the internal image while we are making the copy.
+		
 	    synchronized (this) 
 	    {
 	    	if (image == null)
