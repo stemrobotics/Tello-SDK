@@ -55,8 +55,9 @@ public class Demo3
 		    
 		    telloControl.rotateRight(90);
 		    
-		    // fly a curve to a point 3.25 feet in front of the drone.
-		    telloControl.curve(25, 25, 0, 100, 0, 0, 20);
+		    // fly a curve to a point 3.25 feet in front of the drone and 
+		    // 1.5 feet higher.
+		    telloControl.curve(25, 25, 0, 100, 0, 50, 20);
 		    
 		    //telloControl.doFlip(TelloFlip.backward);
 	    }	

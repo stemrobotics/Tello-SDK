@@ -138,7 +138,7 @@ public interface TelloControlInterface
    * Fly at a curve starting at drone current position according to the two given offset coordinates at speed (cm/s). 
    * The first coordinate is the intermediate point on the curve and second is the end point of the curve.
    * If the arc radius is not within a range of 0.5 to 10 meters, it will respond with an error. 
-   * x, y and z values = -500 to +500, speed = 10 to 60. 
+   * x, y and z values (cm) = -500 to +500, speed = 10 to 60. 
    * Note: x, y, and z values can't be set between -20 and +20 simultaneously.
    */
   void curve(Integer x1, Integer y1, Integer z1, Integer x2, Integer y2, Integer z2, Integer speed);
