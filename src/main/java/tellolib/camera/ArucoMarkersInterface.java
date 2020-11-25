@@ -6,8 +6,6 @@ import org.opencv.core.Rect;
 
 import java.util.ArrayList;
 
-import org.opencv.aruco.*;
-
 /**
  * Convenience functions for OpenCV Aruco Markers feature.
  */

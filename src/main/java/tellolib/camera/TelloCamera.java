@@ -47,6 +47,7 @@ public class TelloCamera implements TelloCameraInterface
 	private JLabel				jLabel;
 	private String				statusBar = null;
 	private Supplier			<String>statusBarMethod = null;
+	private Object				lockObj = new Object();
 	
 	private ArrayList<Rect>			targetRectangles;
 	private ArrayList<MatOfPoint>	contours = null;
@@ -157,7 +158,7 @@ public class TelloCamera implements TelloCameraInterface
 		// synchronized key word prevents the processing thread from changing
 		// the internal image while we are making the copy.
 		
-	    synchronized (this) 
+	    synchronized (lockObj) 
 	    {
 	    	if (image == null)
 	    		return null;
@@ -190,32 +191,36 @@ public class TelloCamera implements TelloCameraInterface
 	    		
 	    		while (!isInterrupted())
 	    		{
-	    		    synchronized (this) { camera.read(imageRaw); }
+	    		    camera.read(imageRaw);
 	    			
-	    		    // Resize raw image to window (frame) size.
-	    			Imgproc.resize(imageRaw, image, videoFrameSize);
+	    			synchronized (lockObj) 
+	    			{
+		    		    // Resize raw image to window (frame) size.
+	    				
+	    				Imgproc.resize(imageRaw, image, videoFrameSize);
 	
-	    		    // Draw target rectangles/contours on image.
+	    		    	// Draw target rectangles/contours on image.
 	    		    
-	    			if (targetRectangles != null)
-	    				for (Rect rect: targetRectangles) 
-	    					Imgproc.rectangle(image, 
-	    							new Point(rect.x, rect.y), 
-	    							new Point(rect.x + rect.width, rect.y +  rect.height), 
-	    							targetColor, targetWidth);
-	    			
-	    			if (contours != null) Imgproc.drawContours(image, contours, -1, contourColor, contourWidth);
-
-	    			// Draw status bar text on image.
-	    			
-	    			if (statusBar != null && statusBarMethod == null)
-	    				Imgproc.putText(image, statusBar, new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
-	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
-
-	    			if (statusBarMethod != null)
-	    				Imgproc.putText(image, statusBarMethod.get(), new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
-	    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
-
+		    			if (targetRectangles != null)
+		    				for (Rect rect: targetRectangles) 
+		    					Imgproc.rectangle(image, 
+		    							new Point(rect.x, rect.y), 
+		    							new Point(rect.x + rect.width, rect.y +  rect.height), 
+		    							targetColor, targetWidth);
+		    			
+		    			if (contours != null) Imgproc.drawContours(image, contours, -1, contourColor, contourWidth);
+	
+		    			// Draw status bar text on image.
+		    			
+		    			if (statusBar != null && statusBarMethod == null)
+		    				Imgproc.putText(image, statusBar, new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
+		    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
+	
+		    			if (statusBarMethod != null)
+		    				Imgproc.putText(image, statusBarMethod.get(), new Point(0, image.height() - 25), Imgproc.FONT_HERSHEY_PLAIN, 
+		    						1.5, new Scalar(255, 255, 255), 2, Imgproc.FILLED);
+	    			}
+	    		
 	    			// Write image to live window if open.
 	    		    if (jFrame != null)	updateLiveWindow(image);
 	    			
@@ -339,7 +344,7 @@ public class TelloCamera implements TelloCameraInterface
 	@Override
 	public void addTarget( Rect target )
 	{
-		synchronized(this)
+		synchronized(lockObj)
 		{
 			if (target == null)
 			{
@@ -365,7 +370,7 @@ public class TelloCamera implements TelloCameraInterface
 	@Override
 	public void setContours(ArrayList<MatOfPoint> contours)
 	{
-		this.contours = contours;
+		synchronized(lockObj) {this.contours = contours;}
 	}
 
 	@Override
@@ -379,21 +384,24 @@ public class TelloCamera implements TelloCameraInterface
 	
 	public Size getImageSize()
 	{
-		if (image == null) return new Size(0,0);
+		synchronized(lockObj)
+		{
+			if (image == null) return new Size(0,0);
 		
-		return new Size(image.width(), image.height());
+			return new Size(image.width(), image.height());
+		}
 	}
 
 	@Override
 	public void setStatusBar( String message )
 	{
-		statusBar = message;
+		synchronized(lockObj) {statusBar = message;}
 	}
 
 	@Override
 	public void setStatusBar( Supplier<String> method )
 	{
-		statusBarMethod = method;
+		synchronized(lockObj) {statusBarMethod = method;}
 	}
 
 	@Override

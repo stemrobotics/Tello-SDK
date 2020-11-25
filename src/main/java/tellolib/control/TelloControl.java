@@ -479,7 +479,7 @@ public class TelloControl implements TelloControlInterface
     			    
 	    			// If we are flying and height goes to zero and status is still coming
 	    			// it probably means drone has crashed. This condition must persist 
-	    			// for more than 1 second to avoid spurious height = 0 reports.
+	    			// for more than 1 second to avoid spurious height == 0 reports.
 	    			
 	    			if (drone.isFlying() && drone.getHeight() <= 0) 
 	    			{
@@ -489,6 +489,8 @@ public class TelloControl implements TelloControlInterface
 	    			
 	    			if (crashDetected && System.currentTimeMillis() - lastDetectionTime > 1000)
 	    				throw new Exception("crash detected");
+	    			
+	    			// Record status information in Drone class.
 	    			
     			    drone.setAttitude(attpry);
     			    
@@ -616,6 +618,7 @@ public class TelloControl implements TelloControlInterface
 		TelloCommandInterface command = new ComplexTelloCommand(TelloCommandValues.CURVE, 
 				x1.toString() + " " + y1.toString() + " " + z1.toString() + " " + 
 				x2.toString() + " " + y2.toString() + " " + z2.toString() + " " + speed.toString());
+		
 		communication.executeCommand(command);
 	}
 }

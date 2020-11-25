@@ -25,6 +25,17 @@ into Eclipse as an *existing project into workspace* under the General import ca
 The import and preparation of the project will take some time so be patient.
 
 *****************************************************************************************
-Version 0.0
+Version 1.0.1
+
+*	Fix design error in locking scheme in the TelloCamera class.
+*	Fix search function in Javadoc.
+
+Nov 25, 2020
+
+Version 1.0.0
+
+*	Development completed, released June 2020.
+
+Version 0.0.0
 
 *	Under development spring 2020.

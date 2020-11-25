@@ -1,17 +1,10 @@
 package tellolib.control;
 
-import java.util.ArrayList;
 import java.util.logging.Level;
-
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
 
 import tellolib.camera.MissionDetectionCamera;
 import tellolib.command.TelloFlip;
 import tellolib.communication.TelloConnection;
-import tellolib.drone.TelloDroneInterface;
 
 /**
  * Higher level interface to Tello Drone library.
