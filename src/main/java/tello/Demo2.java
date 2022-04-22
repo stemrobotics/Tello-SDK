@@ -66,9 +66,9 @@ public class Demo2
 			
 			sdk = telloControl.getSDK();
 			
-			attitude = drone.getAttitude();
+			attitude = telloControl.getAttitude();
 			
-			acceleration = drone.getAcceleration();
+			acceleration = telloControl.getAcceleration();
 			
 			velocity = drone.getVelocity();
 			    
