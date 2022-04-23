@@ -8,7 +8,7 @@
             "type": "java",
             "name": "Launch Server",
             "request": "launch",
-            "mainClass": "tello.server.Server",
+            "mainClass": "tello.Server",
             "projectName": "Tello-Demo"
         },
         {
@@ -21,7 +21,7 @@
             "type": "java",
             "name": "Launch Main Test",
             "request": "launch",
-            "mainClass": "tello.TestMain",
+            "mainClass": "tello.Main",
             "projectName": "Tello-Demo"
         }
     ]
