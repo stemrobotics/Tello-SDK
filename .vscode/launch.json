@@ -19,9 +19,9 @@
         },
         {
             "type": "java",
-            "name": "Launch Main",
+            "name": "Launch Main Test",
             "request": "launch",
-            "mainClass": "tello.Main",
+            "mainClass": "tello.TestMain",
             "projectName": "Tello-Demo"
         }
     ]
