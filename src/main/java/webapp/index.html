@@ -7,6 +7,13 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <div id="testpost"></div>
 </body>
+<script>
+    fetch(`testPOST?hello="world"`).then(function(response) {
+        return response.text();
+    }).then(function(data) {
+        console.log(data);
+    });
+</script>
 </html>

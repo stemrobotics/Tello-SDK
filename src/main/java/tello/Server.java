@@ -10,6 +10,7 @@ import java.io.OutputStream;
 
 import tello.server.constant.ServerConstant;
 import tello.server.handler.ServerResourceHandler;
+import tello.server.handler.TestPost;
 import com.sun.net.httpserver.HttpServer;
 
 public class Server implements Runnable {
@@ -53,6 +54,12 @@ public class Server implements Runnable {
 			executor = Executors.newFixedThreadPool(10);
 
 			httpServer = HttpServer.create(new InetSocketAddress(ServerConstant.DEFAULT_HOST, port), 0);
+			
+			httpServer.createContext(
+				ServerConstant.FORWARD_DOUBLE_SLASH + "testPOST", 
+				new TestPost()
+			);
+			
 			httpServer.createContext(
                 ServerConstant.FORWARD_SINGLE_SLASH, 
                 new ServerResourceHandler(serverHome, true, false)

@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
-import tello.server.Server;
 import tello.server.constant.ServerConstant;
 import tello.server.enums.HttpMethod;
 import tello.server.utils.ServerUtil;
@@ -28,6 +27,7 @@ public class ServerResourceHandler implements HttpHandler {
     private final boolean gzippable;
     private final boolean cacheable;
     private final Map<String, Resource> resources = new HashMap<>();
+    private Handler404 handler404;
 
     public ServerResourceHandler(String pathToRoot, boolean gzippable, boolean cacheable) throws IOException {
         this.pathToRoot = pathToRoot.endsWith(ServerConstant.FORWARD_SINGLE_SLASH) ? pathToRoot : pathToRoot + ServerConstant.FORWARD_SINGLE_SLASH;
@@ -43,6 +43,8 @@ public class ServerResourceHandler implements HttpHandler {
         for (File f : files) {
             processFile("", f, gzippable);
         }
+
+        handler404 = new Handler404();
     }
 
     @Override
@@ -132,38 +134,7 @@ public class ServerResourceHandler implements HttpHandler {
             writeOutput(httpExchange, re.content.length, re.content, mimeType);
         }else {
             // Send a 404 response if possible... If not do default 404 message
-            server404(httpExchange, ServerConstant.Error404File);
-        }
-    }
-
-    public void server404(HttpExchange httpExchange, String resourcePath) throws IOException {
-        File file = new File(resourcePath);
-
-        if (file.exists()) {
-            InputStream in = new FileInputStream(resourcePath);
-
-            Resource re = null;
-
-            if (cacheable) {
-                if (resources.get(resourcePath) == null) {
-                    re = new Resource(readResource(in, gzippable));
-                }else {
-                    re = resources.get(resourcePath);
-                }
-            }else {
-                re = new Resource(readResource(in, gzippable));
-            }
-
-            if (gzippable) {
-                httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_ENCODING, ServerConstant.ENCODING_GZIP);
-            }
-
-            String mimeType = ServerUtil.getFileMime(resourcePath);
-
-            writeOutput(httpExchange, re.content.length, re.content, mimeType);
-        }else {
-            LOGGER.severe("Couldn't find error 404 file: " + ServerConstant.Error404File);
-            showError(httpExchange, 404, ServerConstant.Error404FileMessage);
+            handler404.server404(httpExchange, ServerConstant.Error404File);
         }
     }
 
@@ -189,15 +160,48 @@ public class ServerResourceHandler implements HttpHandler {
         }
     }
 
-    private void showError(HttpExchange httpExchange, int respCode, String errDesc) throws IOException {
-		String message = "HTTP error " + respCode + ": " + errDesc;
-		byte[] messageBytes = message.getBytes(ServerConstant.ENCODING_UTF8);
-
-		httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_TYPE, ServerConstant.TEXT_PLAIN);
-		httpExchange.sendResponseHeaders(respCode, messageBytes.length);
-
-		OutputStream os = httpExchange.getResponseBody();
-		os.write(messageBytes);
-		os.close();
-	}
+    public class Handler404 {
+        public void server404(HttpExchange httpExchange, String resourcePath) throws IOException {
+            File file = new File(resourcePath);
+    
+            if (file.exists()) {
+                InputStream in = new FileInputStream(resourcePath);
+    
+                Resource re = null;
+    
+                if (cacheable) {
+                    if (resources.get(resourcePath) == null) {
+                        re = new Resource(readResource(in, gzippable));
+                    }else {
+                        re = resources.get(resourcePath);
+                    }
+                }else {
+                    re = new Resource(readResource(in, gzippable));
+                }
+    
+                if (gzippable) {
+                    httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_ENCODING, ServerConstant.ENCODING_GZIP);
+                }
+    
+                String mimeType = ServerUtil.getFileMime(resourcePath);
+    
+                writeOutput(httpExchange, re.content.length, re.content, mimeType);
+            }else {
+                LOGGER.severe("Couldn't find error 404 file: " + ServerConstant.Error404File);
+                showError(httpExchange, 404, ServerConstant.Error404FileMessage);
+            }
+        }
+    
+        private void showError(HttpExchange httpExchange, int respCode, String errDesc) throws IOException {
+            String message = "HTTP error " + respCode + ": " + errDesc;
+            byte[] messageBytes = message.getBytes(ServerConstant.ENCODING_UTF8);
+    
+            httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_TYPE, ServerConstant.TEXT_PLAIN);
+            httpExchange.sendResponseHeaders(respCode, messageBytes.length);
+    
+            OutputStream os = httpExchange.getResponseBody();
+            os.write(messageBytes);
+            os.close();
+        }
+    }
 }

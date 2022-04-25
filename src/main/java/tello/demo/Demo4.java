@@ -1,4 +1,4 @@
-package tello;
+package tello.demo;
 
 import static java.lang.Thread.sleep;
 
