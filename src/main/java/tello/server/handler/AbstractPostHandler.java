@@ -3,12 +3,12 @@ package tello.server.handler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import org.json.JSONObject;
+
+import tello.server.constant.ServerConstant;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -21,55 +21,53 @@ public abstract class AbstractPostHandler implements HttpHandler {
      * @return - A map of the parameters.
      * @throws IOException
      */
-    public Map<String, Object> getParamaters(HttpExchange he) {
-        // Parse request parameter
-        Map<String, Object> params = new HashMap<String, Object>();
+    public JSONObject getParamaters(HttpExchange he) {
         try {
             InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
 
             BufferedReader br = new BufferedReader(isr);
             String query = br.readLine();
             
-            parseQuery(query, params);
+            return parseQuery(query);
         }catch (Exception e) {
             e.printStackTrace();
         }
 
-        return params;
+        return new JSONObject("data: {}");
     }
 
-    public static void parseQuery(String query, Map<String, Object> parameters) throws UnsupportedEncodingException {
+    public static JSONObject parseQuery(String query) throws UnsupportedEncodingException {
         if (query != null) {
-            String pairs[] = query.split("[&]");
-            for (String pair : pairs) {
-                String param[] = pair.split("[=]");
-
-                String key = null;
-                String value = null;
-
-                if (param.length > 0) {
-                    key =  URLDecoder.decode(
-                        param[0], 
-                        System.getProperty("file.encoding")
-                    );
-                }
-
-                if (parameters.containsKey(key)) {
-                    Object obj = parameters.get(key);
-
-                    if (obj instanceof List<?>) {
-                        List<String> values =  (List<String>) obj;
-                        values.add(value);
-                    }else if (obj instanceof String) {
-                        List<String> values =  new ArrayList<String>();
-                        values.add( (String) obj );  
-                        values.add(value);
-                        parameters.put(key, values);
-                    }
-                }else {
-                    parameters.put(key, value);
-                }
-            }
+            return new JSONObject(" { data : " + query + " }");
+        }else {
+            return new JSONObject("{ data: {} }");
         }
+    }
+
+    public void sendJSONResponse(HttpExchange he, JSONObject json) throws IOException {
+        he.getResponseHeaders().set(ServerConstant.CONTENT_TYPE, ServerConstant.APPLICATION_JSON);
+        he.sendResponseHeaders(200, json.toString().length());
+
+        OutputStream os = he.getResponseBody();
+        os.write(json.toString().getBytes());
+        os.close();
+    }
+
+    public void sendStringResponse(HttpExchange he, JSONObject json) throws IOException {
+        he.getResponseHeaders().set(ServerConstant.CONTENT_TYPE, ServerConstant.TEXT_PLAIN);
+        he.sendResponseHeaders(200, json.toString().length());
+
+        OutputStream os = he.getResponseBody();
+        os.write(json.toString().getBytes());
+        os.close();
+    }
+
+    public void sendStringResponse(HttpExchange he, String response) throws IOException {
+        he.getResponseHeaders().set(ServerConstant.CONTENT_TYPE, ServerConstant.TEXT_PLAIN);
+        he.sendResponseHeaders(200, response.length());
+
+        OutputStream os = he.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
     }
 }

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +29,11 @@ public class ServerResourceHandler implements HttpHandler {
     private final boolean cacheable;
     private final Map<String, Resource> resources = new HashMap<>();
     private Handler404 handler404;
+    private HandlerManager handlerManager;
 
     public ServerResourceHandler(String pathToRoot, boolean gzippable, boolean cacheable) throws IOException {
-        this.pathToRoot = pathToRoot.endsWith(ServerConstant.FORWARD_SINGLE_SLASH) ? pathToRoot : pathToRoot + ServerConstant.FORWARD_SINGLE_SLASH;
+        this.pathToRoot = pathToRoot.endsWith(ServerConstant.FORWARD_SINGLE_SLASH) ? pathToRoot
+                : pathToRoot + ServerConstant.FORWARD_SINGLE_SLASH;
 
         this.gzippable = gzippable;
         this.cacheable = cacheable;
@@ -38,43 +41,45 @@ public class ServerResourceHandler implements HttpHandler {
         File[] files = new File(pathToRoot).listFiles();
         if (files == null) {
             throw new IOException("Couldn't find webroot: " + pathToRoot);
-        }    
+        }
 
         for (File f : files) {
             processFile("", f, gzippable);
         }
 
         handler404 = new Handler404();
+
+        handlerManager = new HandlerManager(handler404);
+
+        handlerManager.addHandler(
+            "/testPOST", 
+            new Handler(
+                new TestPost(), 
+                Arrays.asList(HttpMethod.POST.getName())
+            )
+        );
     }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         String request = httpExchange.getRequestURI().getPath();
 
-        LOGGER.info("Requested Path: "+ request);
+        LOGGER.info("Requested Path: " + request);
 
         serveResource(httpExchange, request);
     }
 
-    private class Resource {
-        public final byte[] content;
+    private void processFile(String path, File file, boolean gzippable) throws IOException {
+        if (!file.isDirectory()) {
+            resources.put(path + file.getName(), new Resource(readResource(new FileInputStream(file), gzippable)));
+        }
 
-        public Resource(byte[] content) {
-            this.content = content;
+        if (file.isDirectory()) {
+            for (File sub : file.listFiles()) {
+                processFile(path + file.getName() + ServerConstant.FORWARD_SINGLE_SLASH, sub, gzippable);
+            }
         }
     }
-
-    private void processFile(String path, File file, boolean gzippable) throws IOException {
-		if (!file.isDirectory()) {
-			resources.put(path + file.getName(), new Resource(readResource(new FileInputStream(file), gzippable)));
-		}
-
-		if (file.isDirectory()) {
-			for (File sub : file.listFiles()) {
-				processFile(path + file.getName() + ServerConstant.FORWARD_SINGLE_SLASH, sub, gzippable);
-			}
-		}
-	}
 
     private byte[] readResource(final InputStream in, final boolean gzip) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -87,7 +92,7 @@ public class ServerResourceHandler implements HttpHandler {
         while ((r = in.read(bs)) >= 0) {
             gout.write(bs, 0, r);
         }
-        
+
         gout.flush();
         gout.close();
         in.close();
@@ -108,37 +113,48 @@ public class ServerResourceHandler implements HttpHandler {
     }
 
     private void serveFile(HttpExchange httpExchange, String resourcePath) throws IOException {
-        File file = new File(resourcePath);
+        if (
+                !HttpMethod.HEAD.getName().equals(httpExchange.getRequestMethod())
+                && 
+                !HttpMethod.GET.getName().equals(httpExchange.getRequestMethod())
+            ) 
+        {
+            handlerManager.handle(httpExchange);
+        } else {
+            File file = new File(resourcePath);
 
-        if (file.exists()) {
-            InputStream in = new FileInputStream(resourcePath);
+            if (file.exists()) {
+                InputStream in = new FileInputStream(resourcePath);
 
-            Resource re = null;
+                Resource re = null;
 
-            if (cacheable) {
-                if (resources.get(resourcePath) == null) {
+                if (cacheable) {
+                    if (resources.get(resourcePath) == null) {
+                        re = new Resource(readResource(in, gzippable));
+                    } else {
+                        re = resources.get(resourcePath);
+                    }
+                } else {
                     re = new Resource(readResource(in, gzippable));
-                }else {
-                    re = resources.get(resourcePath);
                 }
-            }else {
-                re = new Resource(readResource(in, gzippable));
+
+                if (gzippable) {
+                    httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_ENCODING,
+                            ServerConstant.ENCODING_GZIP);
+                }
+
+                String mimeType = ServerUtil.getFileMime(resourcePath);
+
+                writeOutput(httpExchange, re.content.length, re.content, mimeType);
+            } else {
+                // Send a 404 response if possible... If not do default 404 message
+                handler404.server404(httpExchange, ServerConstant.Error404File);
             }
-
-            if (gzippable) {
-                httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_ENCODING, ServerConstant.ENCODING_GZIP);
-            }
-
-            String mimeType = ServerUtil.getFileMime(resourcePath);
-
-            writeOutput(httpExchange, re.content.length, re.content, mimeType);
-        }else {
-            // Send a 404 response if possible... If not do default 404 message
-            handler404.server404(httpExchange, ServerConstant.Error404File);
         }
     }
 
-    private void writeOutput(HttpExchange httpExchange, int contentLength, byte[] content, String contentType) throws IOException {
+    private void writeOutput(HttpExchange httpExchange, int contentLength, byte[] content, String contentType)
+            throws IOException {
         if (HttpMethod.HEAD.getName().equals(httpExchange.getRequestMethod())) {
             Set<Map.Entry<String, List<String>>> entries = httpExchange.getRequestHeaders().entrySet();
 
@@ -152,7 +168,7 @@ public class ServerResourceHandler implements HttpHandler {
             httpExchange.sendResponseHeaders(200, response.length());
             httpExchange.getResponseBody().write(response.getBytes());
             httpExchange.getResponseBody().close();
-        }else {
+        } else {
             httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_TYPE, contentType);
             httpExchange.sendResponseHeaders(200, contentLength);
             httpExchange.getResponseBody().write(content);
@@ -163,42 +179,43 @@ public class ServerResourceHandler implements HttpHandler {
     public class Handler404 {
         public void server404(HttpExchange httpExchange, String resourcePath) throws IOException {
             File file = new File(resourcePath);
-    
+
             if (file.exists()) {
                 InputStream in = new FileInputStream(resourcePath);
-    
+
                 Resource re = null;
-    
+
                 if (cacheable) {
                     if (resources.get(resourcePath) == null) {
                         re = new Resource(readResource(in, gzippable));
-                    }else {
+                    } else {
                         re = resources.get(resourcePath);
                     }
-                }else {
+                } else {
                     re = new Resource(readResource(in, gzippable));
                 }
-    
+
                 if (gzippable) {
-                    httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_ENCODING, ServerConstant.ENCODING_GZIP);
+                    httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_ENCODING,
+                            ServerConstant.ENCODING_GZIP);
                 }
-    
+
                 String mimeType = ServerUtil.getFileMime(resourcePath);
-    
+
                 writeOutput(httpExchange, re.content.length, re.content, mimeType);
-            }else {
+            } else {
                 LOGGER.severe("Couldn't find error 404 file: " + ServerConstant.Error404File);
                 showError(httpExchange, 404, ServerConstant.Error404FileMessage);
             }
         }
-    
+
         private void showError(HttpExchange httpExchange, int respCode, String errDesc) throws IOException {
             String message = "HTTP error " + respCode + ": " + errDesc;
             byte[] messageBytes = message.getBytes(ServerConstant.ENCODING_UTF8);
-    
+
             httpExchange.getResponseHeaders().set(ServerConstant.CONTENT_TYPE, ServerConstant.TEXT_PLAIN);
             httpExchange.sendResponseHeaders(respCode, messageBytes.length);
-    
+
             OutputStream os = httpExchange.getResponseBody();
             os.write(messageBytes);
             os.close();

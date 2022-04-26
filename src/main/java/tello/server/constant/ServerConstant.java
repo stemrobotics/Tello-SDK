@@ -20,6 +20,7 @@ public class ServerConstant {
 	public static final int DEFAULT_PORT = 8000;
 	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	public static final String TEXT_PLAIN = "text/plain; charset=utf-8";
+	public static final String APPLICATION_JSON = "application/json; charset=utf-8";
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String CONTENT_LENGTH = "Content-Length";
 	public static final String CONTENT_ENCODING = "Content-Encoding";

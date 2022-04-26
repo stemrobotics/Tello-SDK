@@ -2,17 +2,20 @@ package tello.server.handler;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import tello.server.constant.ServerConstant;
 
 import tello.server.constant.ServerConstant;
 import tello.server.handler.ServerResourceHandler.Handler404;
 
 public class HandlerManager implements HttpHandler {
-    private Map<String, Object> handlers = new HashMap<String, Object>();
+    private static final Logger LOGGER = Logger.getLogger(HandlerManager.class.getName());
+
+    private Map<String, Handler> handlers = new HashMap<String, Handler>();
 
     private Handler404 handler404;
 
@@ -20,38 +23,25 @@ public class HandlerManager implements HttpHandler {
         this.handler404 = handler404;
     }
 
-    public void addHandler(String path, List<Object> methods, Object handler) {
-        Map<String, Object> handlerMap = new HashMap<String, Object>();
-
-        handlerMap.put("methods", methods);
-        handlerMap.put("handler", handler);
-
-        handlers.put(path, handlerMap);
+    public void addHandler(String route, Handler handler) {
+        handlers.put(route, handler);
     }
 
     @Override
     public void handle(HttpExchange he) throws IOException {
-        if (handlers.containsKey( getPath(he) ) ) {
-            Map<String, Object> handlerMap = (Map<String, Object>) handlers.get( getPath(he) );
+        String path =  getPath( he );
 
-            if (handlerMap.containsKey("methods")) {
-                List<Object> methods = (List<Object>) handlerMap.get("methods");
+        LOGGER.info("Route Requested With HandlerManager: "  + path);
 
-                if (methods.contains( getMethod(he) )) {
-                    Object handler = handlerMap.get("handler");
+        if (handlers.containsKey(path)) {
+            Handler handle = handlers.get(path);
 
-                    if (handler instanceof HttpHandler) {
-                        ((HttpHandler) handler).server404(he, ServerConstant.Error404File);
-                    } else if (handler instanceof Handler404) {
-                        ((Handler404) handler).server404(he, ServerConstant.Error404File);
-                    }
-                } else {
-                    handler404.server404(he, ServerConstant.Error404File);
-                }
-            } else {
+            if ( handle.isMethod( getMethod(he) ) ){ // Can not give handler a method that it isn't allowed to handle
+                handle.handle(he);
+            }else {
                 handler404.server404(he, ServerConstant.Error404File);
             }
-        } else {
+        }else {
             handler404.server404(he, ServerConstant.Error404File);
         }
     }

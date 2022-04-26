@@ -10,8 +10,16 @@
     <div id="testpost"></div>
 </body>
 <script>
-    fetch(`testPOST?hello="world"`).then(function(response) {
-        return response.text();
+    fetch(`testPOST`, {
+        method: "POST",
+        body: JSON.stringify(
+            {
+                name: "test",
+                age: "20"
+            }
+        ),
+    }).then(function(response) {
+        return response.json();
     }).then(function(data) {
         console.log(data);
     });
