@@ -56,11 +56,6 @@ public class Server implements Runnable {
 			httpServer = HttpServer.create(new InetSocketAddress(ServerConstant.DEFAULT_HOST, port), 0);
 			
 			httpServer.createContext(
-				ServerConstant.FORWARD_DOUBLE_SLASH + "testPOST", 
-				new TestPost()
-			);
-			
-			httpServer.createContext(
                 ServerConstant.FORWARD_SINGLE_SLASH, 
                 new ServerResourceHandler(serverHome, true, false)
             );

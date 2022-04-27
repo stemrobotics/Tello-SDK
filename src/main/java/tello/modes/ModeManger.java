@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import tello.modes.mode.AbstractMode;
 
 public class ModeManger {
+
+    private String currentMode;
     private Map<String, AbstractMode> modes;
 
     public ModeManger() {
@@ -46,10 +48,25 @@ public class ModeManger {
      * @return  - Returns a new generated id for a mode
      */
     public String generateModeID() {
-        byte[] array =  new byte[7]; // length is bounded by 7
-        new Random().nextBytes(array);
+        String AlphaNumericStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyz0123456789";
+        
+        StringBuilder s = new StringBuilder(10);
 
-        String generatedString = new String(array, Charset.forName("UTF-8"));
+        int i;
+
+        for ( i=0; i < 10; i++) {
+
+            //generating a random number using math.random()
+
+            int ch = (int)(AlphaNumericStr.length() * Math.random());
+
+            //adding Random character one by one at the end of s
+
+            s.append(AlphaNumericStr.charAt(ch));
+
+        }
+
+        String generatedString = s.toString();
 
         if (modes.containsKey(generatedString)) {
             return generateModeID();
@@ -89,5 +106,21 @@ public class ModeManger {
         }
 
         return json;
+    }
+
+    public void runMode(String modeID) {
+        if (currentMode == null) {
+            currentMode = modeID;
+            modes.get(currentMode).execute();
+        }else {
+            if (modes.get(currentMode).doneRunning()) {
+                currentMode = null;
+                runMode(modeID);
+            }else {
+                modes.get(currentMode).stop();
+                currentMode = null;
+                runMode(modeID);
+            }
+        }
     }
 }

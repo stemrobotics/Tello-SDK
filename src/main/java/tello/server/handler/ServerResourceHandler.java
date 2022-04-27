@@ -49,15 +49,23 @@ public class ServerResourceHandler implements HttpHandler {
 
         handler404 = new Handler404();
 
-        handlerManager = new HandlerManager(handler404);
+        handlerManager = HandlerManager.getInstance(handler404);
 
         handlerManager.addHandler(
-            "/testPOST", 
+            "/getModes", 
             new Handler(
-                new TestPost(), 
+                new GetModes(), 
                 Arrays.asList(HttpMethod.POST.getName())
             )
         );
+
+        handlerManager.addHandler(
+            "/runMode",
+            new Handler(
+                new RunMode(),
+                Arrays.asList(HttpMethod.POST.getName())
+            )
+        )
     }
 
     @Override

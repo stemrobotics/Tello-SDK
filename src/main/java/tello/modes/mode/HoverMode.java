@@ -2,8 +2,6 @@ package tello.modes.mode;
 
 import java.util.logging.Logger;
 
-import tellolib.communication.TelloConnection;
-
 public class HoverMode extends AbstractMode {
     public HoverMode(String name, String description) {
         super(name, description);
@@ -12,7 +10,19 @@ public class HoverMode extends AbstractMode {
 
     @Override
     public void execute() {
+        stillRunning = true;
+
         // TODO Auto-generated method stub
-        
+        telloControl.connect();
+
+        telloControl.takeOff();
+
+        telloControl.startStatusMonitor();
+
+        telloControl.setSpeed(10);
+
+        telloControl.up(50);
+
+        stillRunning = false;
     }
 }

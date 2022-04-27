@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import tello.modes.ModeManger;
+import tello.modes.mode.HoverMode;
 import tello.server.constant.ServerConstant;
 import tello.server.handler.ServerResourceHandler.Handler404;
 
@@ -19,13 +20,27 @@ public class HandlerManager implements HttpHandler {
 
     private Handler404 handler404;
 
-    private ModeManger modeManger;
+    private static ModeManger modeManger;
+
+    private static HandlerManager instance;
+
+    public static HandlerManager getInstance(Handler404 server404) {
+        if (instance == null) {
+            instance = new HandlerManager(server404);
+        }
+
+        return instance;
+    }
 
     public HandlerManager(Handler404 handler404) {
         this.handler404 = handler404;
         modeManger = new ModeManger();
 
-        //modeManger.addMode();
+        modeManger.addMode(new HoverMode("Hover", "Hovers 50cm up"));
+    }
+
+    public static ModeManger getModeManger() {
+        return modeManger;
     }
 
     public void addHandler(String route, Handler handler) {
