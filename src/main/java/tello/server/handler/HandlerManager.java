@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import tello.server.constant.ServerConstant;
 
+import tello.modes.ModeManger;
 import tello.server.constant.ServerConstant;
 import tello.server.handler.ServerResourceHandler.Handler404;
 
@@ -19,8 +19,13 @@ public class HandlerManager implements HttpHandler {
 
     private Handler404 handler404;
 
+    private ModeManger modeManger;
+
     public HandlerManager(Handler404 handler404) {
         this.handler404 = handler404;
+        modeManger = new ModeManger();
+
+        //modeManger.addMode();
     }
 
     public void addHandler(String route, Handler handler) {
