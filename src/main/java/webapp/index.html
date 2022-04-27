@@ -12,13 +12,7 @@
 </body>
 <script>
     fetch(`getModes`, {
-        method: "POST",
-        body: JSON.stringify(
-            {
-                name: "test",
-                age: "20"
-            }
-        ),
+        method: "POST"
     }).then(function(response) {
         return response.json();
     }).then(function(data) {
@@ -46,6 +40,11 @@
             return response.json();
         }).then(function (data) {
             console.log(data);
+            if (data.status == "failure") {
+                alert("Failed to run drone mode");
+            } else {
+                alert("Drone Mode has been started");
+            }
         });
     }
 </script>

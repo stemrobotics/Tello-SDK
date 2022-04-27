@@ -24,6 +24,10 @@ public class HandlerManager implements HttpHandler {
 
     private static HandlerManager instance;
 
+    public static HandlerManager getInstance() {
+        return instance;
+    }
+
     public static HandlerManager getInstance(Handler404 server404) {
         if (instance == null) {
             instance = new HandlerManager(server404);
