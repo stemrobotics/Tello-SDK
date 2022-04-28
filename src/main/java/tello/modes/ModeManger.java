@@ -13,7 +13,7 @@ import tello.modes.mode.AbstractMode;
 
 public class ModeManger {
 
-    private String currentMode;
+    private String currentMode = null;
     private Map<String, AbstractMode> modes;
 
     public ModeManger() {
@@ -113,13 +113,15 @@ public class ModeManger {
             currentMode = modeID;
             modes.get(currentMode).execute();
         }else {
-            if (modes.get(currentMode).doneRunning()) {
-                currentMode = null;
-                runMode(modeID);
-            }else {
-                modes.get(currentMode).stop();
-                currentMode = null;
-                runMode(modeID);
+            if (currentMode != null) {
+                if (modes.get(currentMode).doneRunning()) {
+                    currentMode = null;
+                    runMode(modeID);
+                }else {
+                    modes.get(currentMode).stopExecution();
+                    currentMode = null;
+                    runMode(modeID);
+                }
             }
         }
     }

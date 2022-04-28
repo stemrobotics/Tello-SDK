@@ -25,6 +25,7 @@ public class RunMode extends AbstractPostHandler {
 
         }catch (Exception e) {
             status = "failure";
+            e.printStackTrace();
         }
 
         sendJSONResponse( he, new JSONObject().put( "status", status ));

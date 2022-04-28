@@ -8,12 +8,16 @@ public class HoverMode extends AbstractMode {
         //TODO Auto-generated constructor stub
     }
 
-    @Override
-    public void execute() {
+    public void run() {
+        super.run();
+
         stillRunning = true;
 
         // TODO Auto-generated method stub
+        tellocoms.setTimeout(50000);
         telloControl.connect();
+
+        telloControl.enterCommandMode();
 
         telloControl.takeOff();
 
@@ -23,6 +27,11 @@ public class HoverMode extends AbstractMode {
 
         telloControl.up(50);
 
-        stillRunning = false;
+        stopExecution();
+    }
+
+    @Override
+    public void execute() {
+        start();
     }
 }
