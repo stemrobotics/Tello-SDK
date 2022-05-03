@@ -9,8 +9,6 @@ public class HoverMode extends AbstractMode {
     }
 
     public void run() {
-        super.run();
-
         stillRunning = true;
 
         // TODO Auto-generated method stub
@@ -32,6 +30,6 @@ public class HoverMode extends AbstractMode {
 
     @Override
     public void execute() {
-        start();
+        run();
     }
 }
