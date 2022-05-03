@@ -1,7 +1,7 @@
 package tellolib.control;
 
 import tellolib.camera.MissionDetectionCamera;
-//import tellolib.camera.TelloCamera;
+import tellolib.camera.TelloCamera;
 import tellolib.command.BasicTelloCommand;
 import tellolib.command.ComplexTelloCommand;
 import tellolib.command.TelloCommandInterface;

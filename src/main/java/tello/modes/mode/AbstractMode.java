@@ -8,7 +8,7 @@ import tellolib.communication.TelloCommunication;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
-public abstract class AbstractMode extends Thread{
+public abstract class AbstractMode{
     protected String name;
     protected String description;
     
