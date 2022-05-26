@@ -2,8 +2,8 @@ package tello.modes.mode;
 
 public class HoverLeftMode extends AbstractMode{
 
-    public HoverLeftMode(String name, String description) {
-        super(name, description);
+    public HoverLeftMode() {
+        super();
     }
 
     public void run() {
@@ -32,6 +32,18 @@ public class HoverLeftMode extends AbstractMode{
     @Override
     public void execute() {
         run();
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return "Hover Left";
+    }
+
+    @Override
+    public String getDescription() {
+        // TODO Auto-generated method stub
+        return "Hovers up 50cm and then ggoes left 50cm";
     }
     
 }
