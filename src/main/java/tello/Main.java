@@ -4,8 +4,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-
+import tello.demo.Demo3;
 import tello.server.constant.ServerConstant;
 
 // Main class contains the method main(), which is what Java JRE 
@@ -47,7 +46,7 @@ public class Main
 		serverHome =  args.length > 0 ? args[0] : loader.getResource(ServerConstant.WEBAPP_DIR).getPath();
         port = args.length != 1 ? ServerConstant.DEFAULT_PORT : Integer.parseInt(args[1]);
 
-        server = new Server();
+        server = new Server(); //testing changes
 
 		
 

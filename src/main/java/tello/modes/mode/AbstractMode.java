@@ -4,14 +4,16 @@ import org.json.JSONObject;
 
 import java.util.logging.Level;
 
+import tellolib.communication.TelloCommunication;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
 
-public abstract class AbstractMode {
+public abstract class AbstractMode{
     protected String name;
     protected String description;
     
     protected TelloControl telloControl;
+    protected TelloCommunication tellocoms;
     protected TelloDrone drone;
 
     protected Boolean stillRunning = false;
@@ -19,6 +21,7 @@ public abstract class AbstractMode {
     public AbstractMode() {
         telloControl = TelloControl.getInstance();
         drone = TelloDrone.getInstance();
+        tellocoms = TelloCommunication.getInstance();
 
         telloControl.setLogLevel(Level.FINE);
     }
@@ -61,7 +64,8 @@ public abstract class AbstractMode {
     /**
      * Stops running the mode, lands the robot and then disconnect from it
      */
-    public void stop() {
+    public void stopExecution() {
         telloControl.disconnect();
+        stillRunning = false;
     }
 }

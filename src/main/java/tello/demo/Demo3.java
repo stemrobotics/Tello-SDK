@@ -3,6 +3,7 @@ package tello.demo;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import tellolib.communication.TelloCommunication;
 import tellolib.communication.TelloConnection;
 import tellolib.control.TelloControl;
 import tellolib.drone.TelloDrone;
@@ -23,6 +24,7 @@ public class Demo3
 
 	    try 
 	    {
+			TelloCommunication.getInstance().setTimeout(50000);
 		    telloControl.connect();
 		    
 		    telloControl.enterCommandMode();
