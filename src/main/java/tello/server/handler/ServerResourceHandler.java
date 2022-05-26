@@ -114,7 +114,8 @@ public class ServerResourceHandler implements HttpHandler {
         requestPath = requestPath.replaceAll(ServerConstant.FORWARD_DOUBLE_SLASH, ServerConstant.FORWARD_SINGLE_SLASH);
 
         if (requestPath.length() == 0) {
-            requestPath = ServerConstant.homeFileName;
+            requestPath = ServerConstant.HOME_FILE_NAME;
+            System.out.println(pathToRoot + requestPath);
         }
 
         serveFile(httpExchange, pathToRoot + requestPath);
@@ -156,7 +157,7 @@ public class ServerResourceHandler implements HttpHandler {
                 writeOutput(httpExchange, re.content.length, re.content, mimeType);
             } else {
                 // Send a 404 response if possible... If not do default 404 message
-                handler404.server404(httpExchange, ServerConstant.Error404File);
+                handler404.server404(httpExchange, ServerConstant.ERROR_404_FILE);
             }
         }
     }
@@ -212,8 +213,8 @@ public class ServerResourceHandler implements HttpHandler {
 
                 writeOutput(httpExchange, re.content.length, re.content, mimeType);
             } else {
-                LOGGER.severe("Couldn't find error 404 file: " + ServerConstant.Error404File);
-                showError(httpExchange, 404, ServerConstant.Error404FileMessage);
+                LOGGER.severe("Couldn't find error 404 file: " + ServerConstant.ERROR_404_FILE);
+                showError(httpExchange, 404, ServerConstant.ERROR_404_FILE_MESSAGE);
             }
         }
 

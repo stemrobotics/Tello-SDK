@@ -2,10 +2,10 @@ package tello.server.enums;
 
 public enum HttpMethod {
 
-	GET, //
-	POST, //
-	PUT, //
-	DELETE, //
+	GET, 
+	POST,
+	PUT, 
+	DELETE, 
 	HEAD;
 
 	public String getName() {

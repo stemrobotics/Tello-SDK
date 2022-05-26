@@ -5,15 +5,13 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import java.io.IOException;
-import java.io.OutputStream;
 
 import tello.server.constant.ServerConstant;
 import tello.server.handler.ServerResourceHandler;
-import tello.server.handler.TestPost;
 import com.sun.net.httpserver.HttpServer;
 
 public class Server implements Runnable {
+
     private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 
     private static final ClassLoader loader = Server.class.getClassLoader();
@@ -24,8 +22,14 @@ public class Server implements Runnable {
     private static String serverHome;
     private static int port;
 
+    /**
+     * Lets you run the program from either the Server Class or the main Class
+     *
+     * @param args - Not required, but the arguments include the location of the
+     * web app, and the port of the web app
+     */
     public static void main(String[] args) {
-        serverHome =  args.length > 0 ? args[0] : loader.getResource(ServerConstant.WEBAPP_DIR).getPath();
+        serverHome = args.length > 0 ? args[0] : loader.getResource(ServerConstant.WEBAPP_DIR).getPath();
         port = args.length != 1 ? ServerConstant.DEFAULT_PORT : Integer.parseInt(args[1]);
 
         server = new Server();
@@ -38,60 +42,64 @@ public class Server implements Runnable {
 
         try {
             thread.join();
-        }catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public void run() {
-		// This is incase we run the server from the main class rather than the server class;
-		if (server == null) {
-			server =  Main.getServer();
-			port = Main.getServerPort();
-			serverHome = Main.getServerHome();
-		}
+        // This is incase we run the server from the main class rather than the server class;
+        if (server == null) {
+            server = Main.getServer();
+            port = Main.getServerPort();
+            serverHome = Main.getServerHome();
+        }
 
         try {
-			executor = Executors.newFixedThreadPool(10);
+            executor = Executors.newFixedThreadPool(10);
 
-			httpServer = HttpServer.create(new InetSocketAddress(ServerConstant.DEFAULT_HOST, port), 0);
-			
-			httpServer.createContext(
-                ServerConstant.FORWARD_SINGLE_SLASH, 
+            httpServer = HttpServer.create(new InetSocketAddress(ServerConstant.DEFAULT_HOST, port), 0);
+
+            httpServer.createContext(
+                ServerConstant.FORWARD_SINGLE_SLASH,
                 new ServerResourceHandler(serverHome, true, false)
             );
 
-			httpServer.setExecutor(executor);
+            httpServer.setExecutor(executor);
 
-			LOGGER.info("Starting server...");
+            LOGGER.info("Starting server...");
 
-			httpServer.start();
+            httpServer.start();
 
-			LOGGER.info("Server started => " + ServerConstant.DEFAULT_HOST + ":" + port);
+            LOGGER.info("Server started => " + ServerConstant.DEFAULT_HOST + ":" + port);
 
-			// Wait here until shutdown is notified
-			synchronized (this) {
-				try {
-					this.wait();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+            // Wait here until shutdown is notified
+            synchronized (this) {
+                try {
+                    this.wait();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
-		} catch (Exception e) {
-			LOGGER.severe("Error occurred during server starting..." + e);
-		}
+        } catch (Exception e) {
+            LOGGER.severe("Error occurred during server starting..." + e);
+        }
     }
 
+    /**
+     * Shuts down the server, and all applications
+     */
     static void shutDown() {
-		try {
-			LOGGER.info("Shutting down server...");
-			server.httpServer.stop(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        try {
+            LOGGER.info("Shutting down server...");
+            server.httpServer.stop(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		synchronized (server) {
-			server.notifyAll();
-		}
-	}
+        synchronized (server) {
+            server.notifyAll();
+        }
+    }
 }

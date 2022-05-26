@@ -14,11 +14,7 @@ public class RunMode extends AbstractPostHandler {
         try {
             JSONObject params = getParamaters( he );
 
-            String modeID = new JSONObject(
-                params.get(
-                    "data"
-                ).toString()
-            ).getString("modeId");
+            String modeID = params.getString("modeId");
 
             HandlerManager.getModeManger().runMode( modeID );
         }catch (Exception e) {

@@ -37,7 +37,7 @@ public abstract class AbstractMode{
     public abstract String getDescription();
 
     /**
-     * @return - The name and description of the mode in json format
+     * @return - The name and description of the mode in JSON format
      */
     public JSONObject toJson() {
         JSONObject json = new JSONObject();

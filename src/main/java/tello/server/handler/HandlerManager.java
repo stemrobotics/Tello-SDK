@@ -58,10 +58,10 @@ public class HandlerManager implements HttpHandler {
             if ( handle.isMethod( getMethod(he) ) ){ // Can not give handler a method that it isn't allowed to handle
                 handle.handle(he);
             }else {
-                handler404.server404(he, ServerConstant.Error404File);
+                handler404.server404(he, ServerConstant.ERROR_404_FILE);
             }
         }else {
-            handler404.server404(he, ServerConstant.Error404File);
+            handler404.server404(he, ServerConstant.ERROR_404_FILE);
         }
     }
 

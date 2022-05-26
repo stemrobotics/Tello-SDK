@@ -7,11 +7,11 @@ public class ServerConstant {
     private ServerConstant() {}
     
 	/** The name of the file to load when user request the route "/" */
-	public static final String homeFileName = "index.html";
+	public static final String HOME_FILE_NAME = "index.html";
 
-	public static final String Error404File = "404.html";
+	public static final String ERROR_404_FILE = "404.html";
 
-	public static final String Error404FileMessage = "The requested resource is not found on server.";
+	public static final String ERROR_404_FILE_MESSAGE = "The requested resource is not found on server.";
 
     public static final String FORWARD_SINGLE_SLASH = "/";
 	public static final String FORWARD_DOUBLE_SLASH = "//";
