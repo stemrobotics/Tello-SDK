@@ -1,11 +1,8 @@
 package tello.modes.mode;
 
-import java.util.logging.Logger;
-
 public class HoverMode extends AbstractMode {
-    public HoverMode(String name, String description) {
-        super(name, description);
-        //TODO Auto-generated constructor stub
+    public HoverMode() {
+        super();
     }
 
     @Override
@@ -25,4 +22,16 @@ public class HoverMode extends AbstractMode {
 
         stillRunning = false;
     }
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return "Hover";
+	}
+
+	@Override
+	public String getDescription() {
+		// TODO Auto-generated method stub
+		return "Hovers 50cm up";
+	}
 }

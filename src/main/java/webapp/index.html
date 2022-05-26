@@ -46,6 +46,12 @@
             return response.json();
         }).then(function (data) {
             console.log(data);
+
+            if (data.status == "failure") {
+                alert("Failed to run drone mode");
+            } else {
+                alert("Drone Mode has been started");
+            }
         });
     }
 </script>

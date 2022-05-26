@@ -9,7 +9,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import tello.modes.ModeManger;
-import tello.modes.mode.HoverMode;
 import tello.server.constant.ServerConstant;
 import tello.server.handler.ServerResourceHandler.Handler404;
 
@@ -36,7 +35,7 @@ public class HandlerManager implements HttpHandler {
         this.handler404 = handler404;
         modeManger = new ModeManger();
 
-        modeManger.addMode(new HoverMode("Hover", "Hovers 50cm up"));
+        modeManger.run();
     }
 
     public static ModeManger getModeManger() {

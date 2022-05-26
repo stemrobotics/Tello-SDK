@@ -16,9 +16,7 @@ public abstract class AbstractMode {
 
     protected Boolean stillRunning = false;
 
-    public AbstractMode(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public AbstractMode() {
         telloControl = TelloControl.getInstance();
         drone = TelloDrone.getInstance();
 
@@ -28,24 +26,20 @@ public abstract class AbstractMode {
     /**
      * @return the name
      */
-    public String getName() {
-        return name;
-    }
+    public abstract String getName(); 
 
     /**
      * @return the description
      */
-    public String getDescription() {
-        return description;
-    }
+    public abstract String getDescription();
 
     /**
      * @return - The name and description of the mode in json format
      */
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
-        json.put("name", name);
-        json.put("description", description);
+        json.put("name", getName());
+        json.put("description", getDescription());
 
         return json;
     }

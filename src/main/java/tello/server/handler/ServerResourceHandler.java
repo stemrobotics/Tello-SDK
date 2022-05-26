@@ -65,7 +65,7 @@ public class ServerResourceHandler implements HttpHandler {
                 new RunMode(),
                 Arrays.asList(HttpMethod.POST.getName())
             )
-        )
+        );
     }
 
     @Override

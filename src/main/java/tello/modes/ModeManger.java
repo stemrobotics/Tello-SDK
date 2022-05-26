@@ -1,11 +1,9 @@
 package tello.modes;
 
-
-import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
+import net.sourceforge.stripes.util.ResolverUtil;
 
 import org.json.JSONObject;
 
@@ -15,23 +13,48 @@ public class ModeManger {
 
     private String currentMode;
     private Map<String, AbstractMode> modes;
+    private boolean alreadyRan = false;
 
     public ModeManger() {
         modes = new HashMap<String, AbstractMode>();
     }
 
-    public ModeManger(List<AbstractMode> newModes) {
-        modes = new HashMap<String, AbstractMode>();
+    /**
+     * Starts the mode manager, loads all the modes for later use
+     */
+    public void run() {
+        if (alreadyRan) {
+            return;
+        }
 
-        for (Object mode : newModes) {
-            addMode(mode);
+        alreadyRan = true;
+
+        ResolverUtil<AbstractMode> resolver = new ResolverUtil<AbstractMode>();
+
+        resolver.findImplementations(AbstractMode.class, AbstractMode.class.getPackage().getName());
+
+        for (Class<? extends AbstractMode> exclass : resolver.getClasses()) {
+            AbstractMode mode = null;
+
+            try{ 
+                // The if statement is to prevent an abstract class from being instantiated, because it will give an error
+                if ( !exclass.getDeclaredConstructor().toString().equals("public tello.modes.mode.AbstractMode()") ) {
+                    mode = exclass.getDeclaredConstructor().newInstance();
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            if (mode != null) {
+                this.addMode(mode);
+            }
         }
     }
 
     /**
      * @param mode - The new mode you would like to add
      */
-    public void addMode(Object mode) {
+    private void addMode(AbstractMode mode) {
         modes.put(generateModeID(), (AbstractMode) mode);
     }
 
