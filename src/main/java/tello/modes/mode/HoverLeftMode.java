@@ -36,13 +36,11 @@ public class HoverLeftMode extends AbstractMode{
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
         return "Hover Left";
     }
 
     @Override
     public String getDescription() {
-        // TODO Auto-generated method stub
         return "Hovers up 50cm and then ggoes left 50cm";
     }
     
