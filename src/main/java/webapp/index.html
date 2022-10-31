@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <title>Document</title>
+</head>
+<body>
+    <div id="testpost"></div>
+</body>
+<script>
+    fetch(`getModes`, {
+        method: "POST"
+    }).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        for (let i in data) {
+            let mode = data[i];
+            let div = document.createElement("div");
+            div.className = "mode";
+            div.innerHTML = `
+                <p class='name'>Name : ${mode.name} </p>
+                <p class='description'>description : ${mode.description} </p>
+                <button id="runMode-${i}" onclick="runMode('${i}')">Run</button>
+            `;
+
+            document.getElementById("testpost").appendChild(div);
+        }
+    });
+
+    function runMode(modeId) {
+        fetch("runMode", {
+            method: "POST",
+            body: JSON.stringify({
+                modeId: modeId
+            })
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            console.log(data);
+
+            if (data.status == "failure") {
+                alert("Failed to run drone mode");
+            } else {
+                alert("Drone Mode has been started");
+            }
+        });
+    }
+</script>
+</html>
