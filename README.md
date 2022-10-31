@@ -16,6 +16,9 @@ from the drone and using OpenCV for visual recognition and tracking.
 
 This project is the companion to the STEM Robotics [Java for Robots course](https://stemrobotics.cs.pdx.edu/node/4196), Tello off-ramp.
 
+**Note**: This project is intended for use on Windows PCs as the OpenCV implementation included with the
+project is Windows specific.
+
 ### How to Download
 
 On the github repo, click the **green Clone or Download** button. Then click **download zip**.
